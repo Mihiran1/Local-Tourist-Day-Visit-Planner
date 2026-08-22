@@ -1,0 +1,22 @@
+.login-container {
+  overflow: hidden;
+}
+
+.login-image-side {
+  background-image: url('../assets/LGN.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.login-form-side {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.underline-link {
+  text-decoration: underline;
+}
