@@ -2,7 +2,7 @@ package com.poc.v1.controller;
 
 import com.poc.v1.dto.AttractionDto;
 import com.poc.v1.entity.Attraction;
-import com.poc.v1.service.AttractionService;
+import com.poc.v1.service.Impl.AttractionServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AdminAttractionController {
 
-    private final AttractionService attractionService;
+    private final AttractionServiceImpl attractionService;
 
     @PostMapping
     public ResponseEntity<Attraction> addAttraction(
