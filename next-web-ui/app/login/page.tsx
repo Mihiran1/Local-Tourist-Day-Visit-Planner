@@ -33,8 +33,17 @@ export default function Login() {
     try {
       const response = await api.post('/auth/login', values);
       const { data } = response.data;
-      login(data.token, { email: data.email, role: data.role });
-      router.push('/dashboard');
+      
+      // Backend එකෙන් එවන්නේ accessToken කියලයි
+      login(data.accessToken, { email: data.email, role: data.role });
+      
+      // Role එක අනුව යවන Page එක තීරණය කරනවා
+      if (data.role === 'ADMIN' || data.role === 'ROLE_ADMIN') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/attractions');
+      }
+      
     } catch (error: any) {
       if (error.response?.data?.message) {
         form.setErrors({ email: error.response.data.message });
