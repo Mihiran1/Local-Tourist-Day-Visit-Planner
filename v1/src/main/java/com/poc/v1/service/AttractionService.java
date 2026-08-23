@@ -9,5 +9,6 @@ import java.util.List;
 public interface AttractionService {
     Attraction addAttraction(AttractionDto dto, MultipartFile imageFile) throws IOException;
     List<Attraction> getAllAttractions(String category, String search);
+    Attraction getAttractionById(Long id);
 
 }

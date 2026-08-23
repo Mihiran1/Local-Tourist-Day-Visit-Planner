@@ -74,4 +74,11 @@ public class AttractionServiceImpl implements AttractionService {
         }
         return attractionRepository.findAll();
     }
+
+    @Override
+    public Attraction getAttractionById(Long id) {
+        return attractionRepository.findById(id)
+        .orElseThrow(() -> new com.poc.v1.exception.ResourceNotFoundException("Attraction not found with id: " + id));
+    }
+
 }

@@ -25,4 +25,10 @@ public class PublicAttractionController {
     ) {
             return ResponseEntity.ok(attractionService.getAllAttractions(category, search));
         }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Attraction> getAttractionById(@PathVariable Long id) {
+        return ResponseEntity.ok(attractionService.getAttractionById(id));
     }
+
+}
