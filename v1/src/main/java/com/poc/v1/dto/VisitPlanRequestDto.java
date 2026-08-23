@@ -3,6 +3,9 @@ package com.poc.v1.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class VisitPlanRequestDto {
     private String name;
     private LocalDate tripDate;
