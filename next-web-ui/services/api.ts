@@ -33,8 +33,9 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Token එක Expire වෙලා නම්, ලෝකල් ස්ටෝරේජ් එක මකලා Login එකට යවන්න පුළුවන්
       console.error("Unauthorized! Redirecting to login...");
-      // localStorage.removeItem('token');
-      // window.location.href = '/login';
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

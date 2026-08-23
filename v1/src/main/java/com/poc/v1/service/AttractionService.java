@@ -7,8 +7,13 @@ import java.io.IOException;
 import java.util.List;
 
 public interface AttractionService {
-    Attraction addAttraction(AttractionDto dto, MultipartFile imageFile) throws IOException;
+    Attraction addAttraction(AttractionDto dto, List<MultipartFile> imageFiles)  throws IOException;
+    
     List<Attraction> getAllAttractions(String category, String search);
+    
     Attraction getAttractionById(Long id);
 
+    Attraction updateAttraction(Long id, AttractionDto dto, List<MultipartFile> imageFile) throws IOException;
+    
+    void deleteAttraction(Long id);
 }

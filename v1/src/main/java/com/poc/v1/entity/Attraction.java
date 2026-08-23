@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -38,5 +41,9 @@ public class Attraction {
     private Double latitude;
     private Double longitude;
 
-    private String imageUrl; // සේව් කරන පින්තූරයේ නම/path එක
+    @ElementCollection
+    @CollectionTable(name = "attraction_images", joinColumns = @JoinColumn(name = "attraction_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls = new ArrayList<>();
+
 }
