@@ -10,14 +10,13 @@ export default function AddAttraction() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Mantine Form එකෙන් දත්ත ටික ලේසියෙන්ම අල්ලගන්නවා
   const form = useForm({
     initialValues: {
       name: '',
       category: '',
       description: '',
       distance: '',
-      image: null as File | null,
+      images: [] as File[], // File 1ක් වෙනුවට දැන් Array එකක් එනවා
     },
     validate: {
       name: (value) => (value.trim().length > 0 ? null : 'Name is required'),
@@ -28,25 +27,25 @@ export default function AddAttraction() {
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
     try {
-      // පින්තූර (Files) යවන්න ඕනේ නිසා අපි FormData පාවිච්චි කරනවා (සාමාන්‍ය JSON බෑ)
       const formData = new FormData();
       formData.append('name', values.name);
       formData.append('category', values.category);
       formData.append('description', values.description);
       formData.append('distance', values.distance);
       
-      if (values.image) {
-        formData.append('image', values.image);
+      // තෝරපු පින්තූර ඔක්කොම එකින් එක දානවා
+      if (values.images && values.images.length > 0) {
+        values.images.forEach((file) => {
+          formData.append('images', file); // මෙතන key එක 'images' කියලාම යන්න ඕනේ
+        });
       }
 
-      // අපේ අලුත් API එකට Post Request එකක් යවනවා
       await api.post('/admin/attractions', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      // සාර්ථක වුණාම ආයෙත් Dashboard එකට යනවා
       router.push('/admin/dashboard');
     } catch (error) {
       console.error("Error adding attraction:", error);
@@ -98,14 +97,15 @@ export default function AddAttraction() {
             {...form.getInputProps('description')}
           />
 
-          {/* පින්තූරය Upload කරන තැන */}
+          {/* multiple=true දාලා තියෙන නිසා පින්තූර ගොඩක් තෝරන්න පුළුවන් */}
           <FileInput
-            label={<Text fw={500}>Upload Image</Text>}
-            placeholder="Click to select an image"
+            label={<Text fw={500}>Upload Images</Text>}
+            placeholder="Click to select multiple images"
             accept="image/png,image/jpeg,image/webp"
             mb="xl"
             clearable
-            {...form.getInputProps('image')}
+            multiple
+            {...form.getInputProps('images')}
           />
 
           <Button fullWidth type="submit" loading={loading} color="blue">
