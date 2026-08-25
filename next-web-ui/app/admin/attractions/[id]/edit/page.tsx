@@ -1,22 +1,22 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Container, Paper, Title, Text, Button, Group, TextInput, Select, 
-  Textarea, Grid, FileInput, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor
+  Textarea, Grid, FileInput, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor, Loader, Center
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { 
   IconInfoCircle, IconMapPin, IconCamera, IconDeviceFloppy, 
   IconBuildingMonument, IconCategory, IconCompass, IconClock, 
   IconBulb, IconUpload 
 } from '@tabler/icons-react';
-import api from '../../../../services/api';
+import api from '../../../../../services/api';
 
 const LocationPicker = dynamic(
-  () => import('../../../../components/LocationPicker'),
+  () => import('../../../../../components/LocationPicker'),
   { ssr: false, loading: () => <Text c="dimmed">Loading Map...</Text> }
 );
 
@@ -28,9 +28,13 @@ const timeOptions = Array.from({ length: 24 }).map((_, i) => {
   return `${formattedHour}:${minute}`;
 });
 
-export default function AddAttractionPage() {
+export default function EditAttractionPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id;
+  
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const form = useForm({
     initialValues: {
@@ -53,9 +57,63 @@ export default function AddAttractionPage() {
       category: (value) => (!value ? 'Category is required' : null),
       description: (value) => (!value.trim() ? 'Description is required' : null),
       distance: (value) => (!value.trim() ? 'Location / Distance is required' : null),
-      images: (value) => (value.length === 0 ? 'At least one image is required' : null),
+      // Images are not required for edit, they might just edit text
     },
   });
+
+  // Page එක Load වෙද්දී පරණ Data ගේන කෑල්ල
+  useEffect(() => {
+    if (!id) return;
+    
+    const fetchAttraction = async () => {
+      try {
+        const res = await api.get(`/attractions/${id}`);
+        const data = res.data;
+        
+        // පරණ Opening Time එක කඩලා Drop Downs වලට දාන විදිය
+        const timeStr = data.openingTime || '';
+        let openTime = '';
+        let openAmPm = 'AM';
+        let closeTime = '';
+        let closeAmPm = 'PM';
+        
+        if (timeStr.includes('-')) {
+          const parts = timeStr.split('-');
+          const start = parts[0].trim().split(' ');
+          const end = parts[1].trim().split(' ');
+          if (start.length === 2) { openTime = start[0]; openAmPm = start[1]; }
+          if (end.length === 2) { closeTime = end[0]; closeAmPm = end[1]; }
+        } else if (timeStr.includes(' ')) {
+          const start = timeStr.trim().split(' ');
+          if (start.length === 2) { openTime = start[0]; openAmPm = start[1]; }
+        }
+        
+        // ගෙනාපු Data ටික Form එකට දානවා (Auto fill වෙනවා)
+        form.setValues({
+          name: data.name || '',
+          category: data.category || '',
+          description: data.description || '',
+          distance: data.distance || '',
+          latitude: data.latitude?.toString() || '',
+          longitude: data.longitude?.toString() || '',
+          travelTips: data.travelTips || '',
+          openTime,
+          openAmPm,
+          closeTime,
+          closeAmPm,
+          images: [],
+        });
+        
+      } catch (error) {
+        console.error("Error fetching attraction:", error);
+        alert('Failed to load attraction details.');
+      } finally {
+        setPageLoading(false);
+      }
+    };
+    
+    fetchAttraction();
+  }, [id]);
 
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
@@ -82,15 +140,16 @@ export default function AddAttractionPage() {
         data.append('images', file);
       });
 
-      await api.post('/admin/attractions', data, {
+      // Update කරන නිසා api.put පාවිච්චි කරනවා
+      await api.put(`/admin/attractions/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      alert('Attraction added successfully!');
+      alert('Attraction updated successfully!');
       router.push('/admin/attractions');
     } catch (error) {
       console.error(error);
-      alert('Error adding attraction');
+      alert('Error updating attraction');
     } finally {
       setLoading(false);
     }
@@ -99,23 +158,30 @@ export default function AddAttractionPage() {
   const breadcrumbs = [
     { title: 'Admin', href: '/admin' },
     { title: 'Attractions', href: '/admin/attractions' },
-    { title: 'Add New', href: '#' },
+    { title: 'Edit', href: '#' },
   ].map((item, index) => (
     <Anchor href={item.href} key={index} size="sm" c="dimmed">
       {item.title}
     </Anchor>
   ));
 
+  if (pageLoading) {
+    return (
+      <Center h="100vh">
+        <Loader color="teal" size="xl" />
+      </Center>
+    );
+  }
+
   return (
     <Box bg="gray.0" pb="xl">
       <Container size={1200} py="xl">
         <form onSubmit={form.onSubmit(handleSubmit)}>
           
-          {/* Header Section */}
           <Group justify="space-between" mb="xl" align="flex-end">
             <div>
               <Breadcrumbs separator=">" mb="xs">{breadcrumbs}</Breadcrumbs>
-              <Title order={2} fw={800} c="dark.8">Add New Attraction</Title>
+              <Title order={2} fw={800} c="dark.8">Edit Attraction</Title>
             </div>
             <Button 
               size="md"
@@ -125,14 +191,12 @@ export default function AddAttractionPage() {
               leftSection={<IconDeviceFloppy size={18} />}
               loading={loading}
             >
-              Save Attraction
+              Update Attraction
             </Button>
           </Group>
 
-          {/* Form Sections Stack */}
           <Stack gap="lg">
             
-            {/* Basic Information */}
             <Paper withBorder p="xl" radius="md" shadow="sm" bg="white">
               <Group mb="lg">
                 <ThemeIcon variant="light" color="teal" size="lg" radius="md">
@@ -176,7 +240,6 @@ export default function AddAttractionPage() {
               </Grid>
             </Paper>
 
-            {/* Location Information */}
             <Paper withBorder p="xl" radius="md" shadow="sm" bg="white">
               <Group mb="lg">
                 <ThemeIcon variant="light" color="blue" size="lg" radius="md">
@@ -228,7 +291,6 @@ export default function AddAttractionPage() {
               </Grid>
             </Paper>
 
-            {/* Visitor Information */}
             <Paper withBorder p="xl" radius="md" shadow="sm" bg="white">
               <Group mb="lg">
                 <ThemeIcon variant="light" color="orange" size="lg" radius="md">
@@ -293,7 +355,6 @@ export default function AddAttractionPage() {
               </Grid>
             </Paper>
 
-            {/* Media & Images */}
             <Paper withBorder p="xl" radius="md" shadow="sm" bg="white">
               <Group mb="lg">
                 <ThemeIcon variant="light" color="grape" size="lg" radius="md">
@@ -303,18 +364,15 @@ export default function AddAttractionPage() {
               </Group>
 
               <FileInput 
-                label="Upload Images" 
+                label="Update Images (Optional)" 
+                description="Upload new images only if you want to replace the existing ones."
                 placeholder="Click to browse or drag images here" 
                 multiple 
                 accept="image/*"
-                withAsterisk
                 size="md"
                 leftSection={<IconUpload size={18} style={{ opacity: 0.5 }} />}
                 {...form.getInputProps('images')}
               />
-              <Text size="sm" c="dimmed" mt="sm">
-                High-quality images attract more visitors. You can select multiple images by holding Ctrl (or Cmd on Mac).
-              </Text>
             </Paper>
 
           </Stack>

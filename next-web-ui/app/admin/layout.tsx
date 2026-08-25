@@ -4,7 +4,7 @@ import { AppShell, Burger, Group, Title, NavLink, Avatar, Menu, rem, Text, Image
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
-import { IconDashboard, IconMapPins, IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconDashboard, IconMapPins, IconLogout, IconSettings, IconList } from '@tabler/icons-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [opened, { toggle }] = useDisclosure();
@@ -82,6 +82,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           leftSection={<IconDashboard size="1rem" stroke={1.5} />}
           active={pathname === '/admin/dashboard'}
           onClick={() => router.push('/admin/dashboard')}
+          color="green.9"  
+          variant="filled"
+          mb="sm"
+        />
+        <NavLink
+          label="All Attractions"
+          leftSection={<IconList size="1rem" stroke={1.5} />}
+          active={pathname === '/admin/attractions'}
+          onClick={() => router.push('/admin/attractions')}
           color="green.9"  
           variant="filled"
           mb="sm"
