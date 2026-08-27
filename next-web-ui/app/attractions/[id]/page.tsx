@@ -84,7 +84,7 @@ export default function AttractionDetailsPage() {
           </Button>
           <Group justify="space-between" align="flex-end">
             <div>
-              <Badge color="teal" size="lg" mb="sm" variant="filled">{attraction.category}</Badge>
+              <Badge size="lg" mb="sm" variant="filled">{attraction.category}</Badge>
               <Title order={1} size="3rem" c="white" fw={900}>{attraction.name}</Title>
               <Flex align="center" gap="xs" c="gray.2" mt="xs">
                 <IconMapPin size={20} />
@@ -158,7 +158,7 @@ export default function AttractionDetailsPage() {
               
               <List spacing="lg" size="sm" center>
                 <List.Item
-                  icon={<ThemeIcon color="teal" size={28} radius="xl" variant="light"><IconClock size={16} /></ThemeIcon>}
+                  icon={<ThemeIcon size={28} radius="xl" variant="light"><IconClock size={16} /></ThemeIcon>}
                 >
                   <Text fw={600}>Opening Hours</Text>
                   <Text c="dimmed">{attraction.openingTime || 'Always Open'}</Text>

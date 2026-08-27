@@ -145,7 +145,7 @@ export default function AddAttractionPage() {
             </div>
             <Button 
               size="md"
-              color="teal.8" 
+              color="darkGreen.8" 
               type="submit" 
               radius="md"
               leftSection={<IconDeviceFloppy size={18} />}
@@ -161,7 +161,7 @@ export default function AddAttractionPage() {
             {/* Basic Information */}
             <Paper withBorder p="xl" radius="md" shadow="sm" bg="white">
               <Group mb="lg">
-                <ThemeIcon variant="light" color="teal" size="lg" radius="md">
+                <ThemeIcon variant="light" size="lg" radius="md">
                   <IconInfoCircle size={20} />
                 </ThemeIcon>
                 <Title order={4}>Basic Information</Title>

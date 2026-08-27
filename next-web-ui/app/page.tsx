@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Image, Badge, ActionIcon, Flex } from '@mantine/core';
-import { IconSearch, IconMapPin, IconHeart } from '@tabler/icons-react';
+import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex } from '@mantine/core';
+import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking } from '@tabler/icons-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api from '../services/api';
 import bg1 from '../assets/BG1.png';
 import bg2 from '../assets/BG2.png';
@@ -23,7 +24,7 @@ export default function HomePage() {
   const [bgIndex, setBgIndex] = useState(0);
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const router = useRouter();
   
   const backgrounds = [bg1.src, bg2.src, bg3.src];
 
@@ -46,20 +47,31 @@ export default function HomePage() {
     fetchAttractions();
   }, []);
 
-  const filteredAttractions = attractions.filter((attraction) => {
-    const matchesSearch = attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          attraction.distance.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory ? attraction.category === selectedCategory : true;
-    return matchesSearch && matchesCategory;
-  });
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/attractions?search=${encodeURIComponent(searchQuery)}`);
+    } else {
+      router.push('/attractions');
+    }
+  };
+
+  // Get only first 4 for Popular Places
+  const popularAttractions = attractions.slice(0, 4);
+
+  const categoryData = [
+    { name: 'Nature & Wildlife', count: 24, icon: <IconTree size={16} />, image: 'https://images.unsplash.com/photo-1613289052028-c1195a62e088?q=80&w=600&auto=format&fit=crop' },
+    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: 'https://images.unsplash.com/photo-1549473889-14f410d83298?q=80&w=600&auto=format&fit=crop' },
+    { name: 'Heritage Sites', count: 12, icon: <IconBuildingMonument size={16} />, image: 'https://images.unsplash.com/photo-1587826388487-19c6f2d25d19?q=80&w=600&auto=format&fit=crop' },
+    { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: 'https://images.unsplash.com/photo-1610093674387-9ee9440bc4c4?q=80&w=600&auto=format&fit=crop' },
+    { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=600&auto=format&fit=crop' },
+  ];
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', paddingBottom: '60px' }}>
       
-      {/* 1. අපි අලුතින් හදපු Navbar එක මෙතනින් දානවා */}
       <Navbar />
 
-      {/* 2. Hero Section එක (ලොකු පින්තූරය තියෙන කොටස) */}
+      {/* Hero Section */}
       <Box 
         style={{
           position: 'relative',
@@ -70,7 +82,6 @@ export default function HomePage() {
           overflow: 'hidden'
         }}
       >
-        {/* Smooth Animated Backgrounds */}
         {backgrounds.map((bg, index) => (
           <div
             key={index}
@@ -91,16 +102,12 @@ export default function HomePage() {
         ))}
 
         <Container size="md" style={{ textAlign: 'center', color: 'white', position: 'relative', zIndex: 1 }}>
-          
           <Title order={1} size="4rem" fw={900} mb="md">
             Explore the Hidden Beauty of Dehiattakandiya
           </Title>
-          
           <Text size="xl" mb="xl" c="gray.2">
             Discover breathtaking landscapes, sacred temples, and amazing wildlife in one of Sri Lanka's most beautiful destinations.
           </Text>
-
-          {/* Search Bar එක */}
           <Group justify="center">
             <TextInput
               size="xl"
@@ -109,6 +116,7 @@ export default function HomePage() {
               leftSection={<IconSearch size={24} style={{ opacity: 0.6 }} />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               style={{ width: '60%', minWidth: '300px' }}
               styles={{
                 input: {
@@ -118,127 +126,167 @@ export default function HomePage() {
                 }
               }}
             />
-            <Button 
-              size="xl" 
-              radius="xl" 
-              color="teal"
-              onClick={() => document.getElementById('attractions-grid')?.scrollIntoView({ behavior: 'smooth' })}
-            >
+            <Button size="xl" radius="xl" onClick={handleSearch}>
               Search
             </Button>
           </Group>
-
         </Container>
       </Box>
 
-      {/* 3. Attractions Grid එක */}
-      <Container size="xl" py={60} id="attractions-grid">
-        <Title order={2} ta="center" mb="sm" fw={800} size="2.5rem">
-          Top Destinations in Dehiattakandiya
-        </Title>
-        <Text c="dimmed" ta="center" mb={40} mx="auto" maw={600}>
-          Explore our handpicked selection of the most beautiful and culturally significant places around Dehiattakandiya.
-        </Text>
-
-        {/* Category Filters */}
-        <Group justify="center" mb={50}>
+      {/* Popular Places Section */}
+      <Container fluid px={{ base: 'md', lg: 150 }} mt={80}>
+        <Group justify="space-between" align="flex-end" mb="xl">
+          <div>
+            <Title order={2} fw={800} c="darkGreen.9">Popular Places</Title>
+            <Text c="dimmed" mt={4}>Most-visited local attractions in this area</Text>
+          </div>
           <Button 
-            variant={selectedCategory === null ? 'filled' : 'light'} 
-            color="teal" 
-            radius="xl"
-            onClick={() => setSelectedCategory(null)}
+            component={Link} 
+            href="/attractions" 
+            variant="transparent" 
+            color="darkGreen.9" 
+            rightSection={<IconArrowRight size={16} />}
+            fw={600}
           >
-            All
+            View All
           </Button>
-          {['Nature & Wildlife', 'Religious & Sacred', 'Heritage Sites', 'Cultural', 'Adventure'].map(cat => (
-            <Button 
-              key={cat}
-              variant={selectedCategory === cat ? 'filled' : 'light'} 
-              color="teal" 
-              radius="xl"
-              onClick={() => setSelectedCategory(cat)}
-            >
-              {cat}
-            </Button>
-          ))}
         </Group>
 
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
-          {filteredAttractions.map((attraction) => {
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+          {popularAttractions.map((attraction) => {
             const firstImage = attraction.imageUrls && attraction.imageUrls.length > 0 
               ? `http://localhost:8080${attraction.imageUrls[0]}` 
-              : 'https://placehold.co/400x250?text=No+Image';
+              : 'https://placehold.co/400x500?text=No+Image';
 
             return (
               <Card 
                 key={attraction.id} 
-                shadow="sm" 
-                padding="lg" 
-                radius="md" 
-                withBorder 
-                style={{ transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'pointer' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-5px)';
-                  e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)';
-                }}
+                radius="xl" 
+                p={0} 
+                style={{ height: '400px', overflow: 'hidden', position: 'relative' }}
               >
-                <Card.Section >
-                  <Image
-                    src={firstImage}
-                    height={200}
-                    alt={attraction.name}
-                    fit="cover"
-                  />
-                  <ActionIcon 
-                    variant="white" 
-                    color="red" 
-                    radius="xl" 
-                    size="lg" 
-                    style={{ position: 'absolute', top: 10, right: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      alert('Please Login to save to Favorites!'); // Mock functionality
-                    }}
-                  >
-                    <IconHeart size={18} stroke={1.5} />
-                  </ActionIcon>
-                </Card.Section>
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                  backgroundImage: `url(${firstImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }} />
+                {/* Gradient Overlay */}
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                  background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%)'
+                }} />
+                
+                <Flex direction="column" justify="space-between" h="100%" p="lg" style={{ position: 'relative', zIndex: 1, color: 'white' }}>
+                  
+                  {/* Top Badges */}
+                  <Group justify="space-between">
+                    <Badge color="white" c="darkGreen.9" radius="xl" size="md" leftSection={<IconTree size={12} style={{ marginTop: 2 }} />}>
+                      {attraction.category.split(' ')[0]}
+                    </Badge>
+                    <Badge color="orange" radius="xl" size="md">Popular</Badge>
+                  </Group>
 
-                <Group justify="space-between" mt="md" mb="xs">
-                  <Text fw={700} size="lg" lineClamp={1}>{attraction.name}</Text>
-                </Group>
+                  {/* Bottom Content */}
+                  <div>
+                    <Title order={3} size="h4" fw={700} lineClamp={1}>{attraction.name}</Title>
+                    <Group gap="xs" mt={8} mb="lg" style={{ opacity: 0.9 }}>
+                      <Flex align="center" gap={4}><IconMapPin size={14} /><Text size="xs">{attraction.distance.split('/')[0] || 'Dehiattakandiya'}</Text></Flex>
+                      <Text size="xs">•</Text>
+                      <Flex align="center" gap={4}><Text size="xs">{attraction.distance}</Text></Flex>
+                    </Group>
 
-                <Group gap={5} mb="md">
-                  <Badge color="teal" variant="light">{attraction.category}</Badge>
-                </Group>
-
-                <Flex align="center" gap={5} c="dimmed" mb="md">
-                  <IconMapPin size={16} />
-                  <Text size="sm">{attraction.distance}</Text>
+                    <Group grow gap="xs">
+                      <Button 
+                        component={Link} 
+                        href={`/attractions/${attraction.id}`} 
+                        color="darkGreen.8" 
+                        radius="xl" 
+                        size="sm"
+                      >
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="white" 
+                        c="darkGreen.9" 
+                        radius="xl" 
+                        size="sm"
+                        leftSection={<IconPlus size={14} />}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          alert('Please Login to add to your plan!');
+                        }}
+                      >
+                        Add to Plan
+                      </Button>
+                    </Group>
+                  </div>
                 </Flex>
-
-                <Text size="sm" c="dimmed" lineClamp={3} style={{ flex: 1 }}>
-                  {attraction.description}
-                </Text>
-
-                <Button 
-                  component={Link} 
-                  href={`/attractions/${attraction.id}`} 
-                  color="teal" 
-                  fullWidth 
-                  mt="md" 
-                  radius="md"
-                >
-                  View Details
-                </Button>
               </Card>
             );
           })}
         </SimpleGrid>
+      </Container>
+
+      {/* Explore by Category Section */}
+      <Container fluid px={{ base: 'md', lg: 150 }} mt={80} mb={60}>
+        <Group justify="space-between" align="flex-end" mb="xl">
+          <div>
+            <Title order={2} fw={800} c="darkGreen.9">Explore by Category</Title>
+            <Text c="dimmed" mt={4}>Find attractions that match your interests</Text>
+          </div>
+          <Button 
+            component={Link} 
+            href="/attractions" 
+            variant="transparent" 
+            color="darkGreen.9" 
+            rightSection={<IconArrowRight size={16} />}
+            fw={600}
+          >
+            All Categories
+          </Button>
+        </Group>
+
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing="md">
+          {categoryData.map((cat, idx) => (
+            <Card 
+              key={idx} 
+              component={Link}
+              href={`/attractions?search=${encodeURIComponent(cat.name)}`}
+              radius="xl" 
+              p={0} 
+              style={{ height: '220px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
+            >
+              <div style={{
+                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                backgroundImage: `url(${cat.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transition: 'transform 0.3s ease',
+              }} className="cat-img" />
+              
+              <div style={{
+                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)'
+              }} />
+              
+              <Flex direction="column" justify="flex-end" h="100%" p="lg" style={{ position: 'relative', zIndex: 1, color: 'white' }}>
+                <Group gap="xs" mb={4}>
+                  {cat.icon}
+                  <Text fw={600} size="md">{cat.name}</Text>
+                </Group>
+                <Text size="xs" opacity={0.7}>{cat.count} Places</Text>
+              </Flex>
+            </Card>
+          ))}
+        </SimpleGrid>
+
+        {/* Global style for hover effect on category cards */}
+        <style jsx global>{`
+          .mantine-Card-root:hover .cat-img {
+            transform: scale(1.1);
+          }
+        `}</style>
       </Container>
     </div>
   );

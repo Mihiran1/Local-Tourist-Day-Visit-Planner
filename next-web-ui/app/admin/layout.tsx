@@ -42,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Menu shadow="md" width={200}>
             <Menu.Target>
               <Group gap="sm" style={{ cursor: 'pointer' }}>
-                <Avatar color="green" radius="xl">{user?.email?.charAt(0).toUpperCase()}</Avatar>
+                <Avatar radius="xl">{user?.email?.charAt(0).toUpperCase()}</Avatar>
                 <Text fw={500} size="sm" visibleFrom="sm">{user?.email}</Text>
               </Group>
             </Menu.Target>
@@ -82,7 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           leftSection={<IconDashboard size="1rem" stroke={1.5} />}
           active={pathname === '/admin/dashboard'}
           onClick={() => router.push('/admin/dashboard')}
-          color="green.9"  
+          color="darkGreen.9"  
           variant="filled"
           mb="sm"
         />
@@ -91,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           leftSection={<IconList size="1rem" stroke={1.5} />}
           active={pathname === '/admin/attractions'}
           onClick={() => router.push('/admin/attractions')}
-          color="green.9"  
+          color="darkGreen.9"  
           variant="filled"
           mb="sm"
         />
@@ -100,7 +100,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           leftSection={<IconMapPins size="1rem" stroke={1.5} />}
           active={pathname === '/admin/attractions/new'}
           onClick={() => router.push('/admin/attractions/new')}
-          color="green.9"  
+          color="darkGreen.9"  
           variant="filled"
         />
       </AppShell.Navbar>

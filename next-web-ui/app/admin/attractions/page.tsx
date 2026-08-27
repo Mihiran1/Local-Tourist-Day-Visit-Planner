@@ -89,7 +89,7 @@ export default function AttractionsListPage() {
 
     return (
       <Table.Tr key={element.id}>
-        <Table.Td><Checkbox color="green.9" /></Table.Td>
+        <Table.Td><Checkbox color="darkGreen.9" /></Table.Td>
         
         <Table.Td>
           <Group gap="sm">
@@ -144,7 +144,7 @@ export default function AttractionsListPage() {
           <Title order={5}>Filters</Title>
           <Group>
             <Text size="xs" c="blue" style={{ cursor: 'pointer' }} onClick={clearFilters}>Clear All</Text>
-            <Button color="green.9" size="sm" onClick={applyFilters}>Apply Filters</Button>
+            <Button color="darkGreen.9" size="sm" onClick={applyFilters}>Apply Filters</Button>
           </Group>
         </Group>
         
@@ -156,7 +156,7 @@ export default function AttractionsListPage() {
                 <Checkbox 
                   key={cat}
                   label={cat} 
-                  color="green.9" 
+                  color="darkGreen.9" 
                   size="sm" 
                   checked={selectedCategories.includes(cat)}
                   onChange={() => toggleCategory(cat)}
@@ -171,7 +171,7 @@ export default function AttractionsListPage() {
                 <Checkbox 
                   key={loc}
                   label={loc} 
-                  color="green.9" 
+                  color="darkGreen.9" 
                   size="sm" 
                   checked={selectedLocations.includes(loc)}
                   onChange={() => toggleLocation(loc)}
@@ -190,7 +190,7 @@ export default function AttractionsListPage() {
             <Text size="sm" c="dimmed">Manage all your travel destinations here</Text>
           </div>
           <Button 
-            color="green.9" 
+            color="darkGreen.9" 
             leftSection={<IconPlus size={16} />}
             onClick={() => router.push('/admin/attractions/new')}
           >
@@ -201,7 +201,7 @@ export default function AttractionsListPage() {
         <Table verticalSpacing="sm" striped highlightOnHover withTableBorder>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th><Checkbox color="green.9" /></Table.Th>
+              <Table.Th><Checkbox color="darkGreen.9" /></Table.Th>
               <Table.Th>Attraction</Table.Th>
               <Table.Th>Category</Table.Th>
               <Table.Th>Location</Table.Th>
@@ -227,7 +227,7 @@ export default function AttractionsListPage() {
             total={Math.max(1, Math.ceil(filteredAttractions.length / ITEMS_PER_PAGE))} 
             value={activePage} 
             onChange={setPage} 
-            color="green.9" 
+            color="darkGreen.9" 
             radius="md" 
           />
         </Group>

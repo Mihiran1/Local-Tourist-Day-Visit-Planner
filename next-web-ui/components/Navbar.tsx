@@ -36,7 +36,7 @@ export default function Navbar() {
               // ලොග් වෙලා නැති සාමාන්‍ය කෙනෙක්ට පේන විදිය
               <>
                 <Button variant="default" onClick={() => router.push('/login')}>Log in</Button>
-                <Button color="teal" onClick={() => router.push('/signup')}>Sign up</Button>
+                <Button onClick={() => router.push('/signup')}>Sign up</Button>
               </>
             ) : (
               // ලොග් වුණු කෙනෙක්ට පේන Profile Menu එක
@@ -44,7 +44,7 @@ export default function Navbar() {
                 <Menu.Target>
                   <UnstyledButton>
                     <Group gap={7}>
-                      <Avatar color="teal" radius="xl">{userName.charAt(0)}</Avatar>
+                      <Avatar radius="xl">{userName.charAt(0)}</Avatar>
                       <Text fw={500} size="sm" lh={1} mr={3}>{userName}</Text>
                       <IconChevronDown size={12} stroke={1.5} />
                     </Group>
