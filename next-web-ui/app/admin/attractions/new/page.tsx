@@ -3,15 +3,17 @@
 import { useState } from 'react';
 import { 
   Container, Paper, Title, Text, Button, Group, TextInput, Select, 
-  Textarea, Grid, FileInput, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor
+  Textarea, Grid, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor,
+  FileButton, Card, SimpleGrid, Image, ActionIcon
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { 
   IconInfoCircle, IconMapPin, IconCamera, IconDeviceFloppy, 
   IconBuildingMonument, IconCategory, IconCompass, IconClock, 
-  IconBulb, IconUpload 
+  IconBulb, IconUpload, IconPhoto, IconX
 } from '@tabler/icons-react';
 import api from '../../../../services/api';
 
@@ -31,6 +33,7 @@ const timeOptions = Array.from({ length: 24 }).map((_, i) => {
 export default function AddAttractionPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const form = useForm({
     initialValues: {
@@ -56,6 +59,21 @@ export default function AddAttractionPage() {
       images: (value) => (value.length === 0 ? 'At least one image is required' : null),
     },
   });
+
+  const handleImagesChange = (files: File[]) => {
+    const newFiles = [...form.values.images, ...files];
+    form.setFieldValue('images', newFiles);
+    
+    const previews = files.map(file => URL.createObjectURL(file));
+    setImagePreviews(prev => [...prev, ...previews]);
+  };
+
+  const removeImage = (index: number) => {
+    const newFiles = form.values.images.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    form.setFieldValue('images', newFiles);
+    setImagePreviews(newPreviews);
+  };
 
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
@@ -97,11 +115,19 @@ export default function AddAttractionPage() {
   };
 
   const breadcrumbs = [
-    { title: 'Admin', href: '/admin' },
+    { title: 'Dashboard', href: '/admin/dashboard' },
     { title: 'Attractions', href: '/admin/attractions' },
-    { title: 'Add New', href: '#' },
-  ].map((item, index) => (
-    <Anchor href={item.href} key={index} size="sm" c="dimmed">
+    { title: 'Add Attraction', href: '#' },
+  ].map((item, index, array) => (
+    <Anchor 
+      component={Link}
+      href={item.href} 
+      key={index} 
+      size="sm" 
+      c={index === array.length - 1 ? "dark.8" : "blue"}
+      fw={index === array.length - 1 ? 600 : 400}
+      style={{ pointerEvents: index === array.length - 1 ? 'none' : 'auto', textDecoration: 'none' }}
+    >
       {item.title}
     </Anchor>
   ));
@@ -302,19 +328,64 @@ export default function AddAttractionPage() {
                 <Title order={4}>Media Gallery</Title>
               </Group>
 
-              <FileInput 
-                label="Upload Images" 
-                placeholder="Click to browse or drag images here" 
-                multiple 
-                accept="image/*"
-                withAsterisk
-                size="md"
-                leftSection={<IconUpload size={18} style={{ opacity: 0.5 }} />}
-                {...form.getInputProps('images')}
-              />
-              <Text size="sm" c="dimmed" mt="sm">
-                High-quality images attract more visitors. You can select multiple images by holding Ctrl (or Cmd on Mac).
-              </Text>
+              <FileButton onChange={handleImagesChange} accept="image/*" multiple>
+                {(props) => (
+                  <Card 
+                    {...props} 
+                    withBorder 
+                    style={{ 
+                      borderStyle: 'dashed', 
+                      borderWidth: 2,
+                      borderColor: form.errors.images ? '#fa5252' : '#ced4da',
+                      cursor: 'pointer', 
+                      textAlign: 'center', 
+                      backgroundColor: '#f8f9fa',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    p="xl"
+                  >
+                    <Group justify="center">
+                      <IconPhoto size={40} style={{ color: '#adb5bd' }} />
+                    </Group>
+                    <Text mt="md" fw={600} size="lg">Click to browse or upload images</Text>
+                    <Text size="sm" c="dimmed">High-quality images attract more visitors. You can select multiple images.</Text>
+                  </Card>
+                )}
+              </FileButton>
+              
+              {form.errors.images && (
+                <Text c="red" size="sm" mt="xs">{form.errors.images}</Text>
+              )}
+
+              {imagePreviews.length > 0 && (
+                <Box mt="lg">
+                  <Text fw={500} size="sm" mb="xs">Selected Images ({imagePreviews.length})</Text>
+                  <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 5 }}>
+                    {imagePreviews.map((preview, index) => (
+                      <div key={index} style={{ position: 'relative' }}>
+                        <Image 
+                          src={preview} 
+                          radius="md" 
+                          h={120} 
+                          w="100%" 
+                          fit="cover" 
+                          style={{ border: '1px solid #dee2e6' }}
+                        />
+                        <ActionIcon 
+                          color="red" 
+                          variant="filled" 
+                          size="sm" 
+                          radius="xl"
+                          style={{ position: 'absolute', top: 5, right: 5, zIndex: 10 }}
+                          onClick={() => removeImage(index)}
+                        >
+                          <IconX size={14} />
+                        </ActionIcon>
+                      </div>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+              )}
             </Paper>
 
           </Stack>
