@@ -5,10 +5,13 @@ import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card
 import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import api from '../services/api';
 import bg1 from '../assets/BG1.png';
 import bg2 from '../assets/BG2.png';
 import bg3 from '../assets/BG3.png';
+
+const MapComponent = dynamic(() => import('../components/Map'), { ssr: false });
 import Navbar from '../components/Navbar';
 
 interface Attraction {
@@ -287,6 +290,79 @@ export default function HomePage() {
             transform: scale(1.1);
           }
         `}</style>
+      </Container>
+
+      {/* Explore on Map Section */}
+      <Container fluid px={{ base: 'md', lg: 150 }} mb={80}>
+        <Group justify="space-between" align="flex-end" mb="xl">
+          <div>
+            <Title order={2} fw={800}>Explore on Map</Title>
+            <Text c="dimmed" mt={4}>Discover all attractions visually on a map</Text>
+          </div>
+          <Button 
+            component={Link} 
+            href="/map" 
+            variant="transparent" 
+            color="primary" 
+            rightSection={<IconArrowRight size={16} />}
+            fw={600}
+          >
+            Open Full Map
+          </Button>
+        </Group>
+
+        <Card 
+          radius="xl" 
+          p={0} 
+          withBorder
+          style={{ height: '450px', position: 'relative', overflow: 'hidden' }}
+        >
+          {/* Static semi-interactive map preview */}
+          <MapComponent 
+            interactive={false}
+            zoom={12}
+            markers={[
+              { id: 1, lat: 7.640, lng: 81.015, name: 'Maduru Oya NP' },
+              { id: 2, lat: 7.620, lng: 81.040, name: 'Kudagala Temple' },
+              { id: 3, lat: 7.630, lng: 81.080, name: 'Henanigala Temple' },
+              { id: 4, lat: 7.660, lng: 81.100, name: 'Nuwaragala' },
+              { id: 5, lat: 7.600, lng: 81.110, name: 'Ancient Sluice' }
+            ]} 
+          />
+          
+          {/* Bottom Overlay Gradient */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '150px',
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%)',
+            pointerEvents: 'none',
+            zIndex: 10
+          }} />
+
+          {/* Bottom Content */}
+          <Flex 
+            justify="space-between" 
+            align="flex-end" 
+            p="xl" 
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 11, pointerEvents: 'none' }}
+          >
+            <Box c="white">
+              <Title order={3} size="h4" fw={700}>Explore Attractions on Map</Title>
+              <Text size="sm" mt={5} opacity={0.9}>Browse and discover all local attractions with an interactive map view.</Text>
+            </Box>
+            <Button 
+              component={Link}
+              href="/map"
+              variant="white" 
+              color="dark" 
+              radius="xl" 
+              size="md"
+              leftSection={<IconMapPin size={16} />}
+              style={{ pointerEvents: 'auto' }}
+            >
+              Open Map
+            </Button>
+          </Flex>
+        </Card>
       </Container>
     </div>
   );
