@@ -19,16 +19,24 @@ export default function Navbar() {
       <Container size="lg" h={70}>
         <Group justify="space-between" h="100%">
           
-          {/* වම් පැත්ත: Logo එක */}
-             <Link href="/">
-            <Image 
-              src="/4.png" 
-              alt="Travel LK Logo" 
-              h={40} // උස ටිකක් අඩුවෙන් දුන්නා Navbar එකට ගැලපෙන්න
-              fit="contain" 
-              style={{ cursor: 'pointer' }}
-            />
-          </Link>
+          <Group gap="xl">
+            <Link href="/">
+              <Image 
+                src="/4.png" 
+                alt="Travel LK Logo" 
+                h={40} 
+                fit="contain" 
+                style={{ cursor: 'pointer' }}
+              />
+            </Link>
+
+            <Group gap="lg" visibleFrom="sm" ml="xl">
+              <Button component={Link} href="/" variant="subtle" color="dark">Home</Button>
+              <Button component={Link} href="/attractions" variant="subtle" color="dark">All Places</Button>
+              <Button component={Link} href="/map" variant="subtle" color="dark">Map View</Button>
+              <Button component={Link} href="/about" variant="subtle" color="dark">About</Button>
+            </Group>
+          </Group>
 
           {/* දකුණු පැත්ත: Buttons හෝ Profile එක */}
           <Group>

@@ -20,10 +20,11 @@ interface Attraction {
 function AttractionsContent() {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
+  const initialCategory = searchParams.get('category') || null;
 
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
 
   useEffect(() => {
     const fetchAttractions = async () => {
@@ -36,6 +37,8 @@ function AttractionsContent() {
     };
     fetchAttractions();
   }, []);
+
+  const uniqueCategories = Array.from(new Set(attractions.map(a => a.category).filter(Boolean)));
 
   const filteredAttractions = attractions.filter((attraction) => {
     const matchesSearch = attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -88,7 +91,7 @@ function AttractionsContent() {
           >
             All Places
           </Button>
-          {['Nature & Wildlife', 'Religious & Sacred', 'Heritage Sites', 'Cultural', 'Adventure'].map(cat => (
+          {uniqueCategories.map(cat => (
             <Button 
               key={cat}
               variant={selectedCategory === cat ? 'filled' : 'light'} 

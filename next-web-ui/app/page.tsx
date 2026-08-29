@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex } from '@mantine/core';
-import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking } from '@tabler/icons-react';
+import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex, Grid, ThemeIcon, List } from '@mantine/core';
+import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking, IconInfoCircle } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -68,6 +68,19 @@ export default function HomePage() {
     { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: 'https://images.unsplash.com/photo-1610093674387-9ee9440bc4c4?q=80&w=600&auto=format&fit=crop' },
     { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=600&auto=format&fit=crop' },
   ];
+
+  const uniqueCategories = Array.from(new Set(attractions.map(a => a.category).filter(Boolean)));
+  const realCategoryData = uniqueCategories.map(catName => {
+    const count = attractions.filter(a => a.category === catName).length;
+    // Find matching static data for icon and image
+    const staticData = categoryData.find(c => c.name.toLowerCase() === catName.toLowerCase());
+    return {
+      name: catName,
+      count,
+      icon: staticData ? staticData.icon : <IconTree size={16} />,
+      image: staticData ? staticData.image : 'https://images.unsplash.com/photo-1613289052028-c1195a62e088?q=80&w=600&auto=format&fit=crop'
+    };
+  });
 
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', paddingBottom: '60px' }}>
@@ -231,6 +244,58 @@ export default function HomePage() {
         </SimpleGrid>
       </Container>
 
+      {/* About Summary Section */}
+      <Box bg="gray.0" py={60} mt={80}>
+        <Container fluid px={{ base: 'md', lg: 150 }}>
+          <Grid gap="xl" align="center">
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Title order={2} fw={800} mb="md" c="darkGreen.9">
+                Welcome to Dehiattakandiya
+              </Title>
+              <Text c="dimmed" size="lg" mb="md" style={{ lineHeight: 1.6 }}>
+                Located in the heart of the Mahaweli System C, Dehiattakandiya is a beautiful town surrounded by lush paddy fields, ancient ruins, and rich wildlife. This application is your ultimate day-visit planner to explore the hidden gems of this region.
+              </Text>
+              
+              <List
+                spacing="sm"
+                size="md"
+                icon={
+                  <ThemeIcon size={20} radius="xl" color="teal">
+                    <IconMapPin size={12} />
+                  </ThemeIcon>
+                }
+              >
+                <List.Item>Bordering the magnificent Maduru Oya National Park</List.Item>
+                <List.Item>Discover ancient temples and cultural heritage</List.Item>
+                <List.Item>Plan your custom day-visit with our interactive tools</List.Item>
+              </List>
+
+              <Button 
+                component={Link} 
+                href="/about" 
+                mt="xl" 
+                radius="xl" 
+                color="darkGreen.8"
+                rightSection={<IconArrowRight size={16} />}
+              >
+                Read More About Us
+              </Button>
+            </Grid.Col>
+            
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Card radius="md" p={0} shadow="md" style={{ overflow: 'hidden' }}>
+                <div style={{
+                  height: '350px',
+                  backgroundImage: 'url(https://images.unsplash.com/photo-1586880244406-556ebe35f282?q=80&w=800&auto=format&fit=crop)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }} />
+              </Card>
+            </Grid.Col>
+          </Grid>
+        </Container>
+      </Box>
+
       {/* Explore by Category Section */}
       <Container fluid px={{ base: 'md', lg: 150 }} mt={80} mb={60}>
         <Group justify="space-between" align="flex-end" mb="xl">
@@ -250,12 +315,16 @@ export default function HomePage() {
           </Button>
         </Group>
 
+        {realCategoryData.length === 0 && (
+          <Text c="dimmed">No categories available.</Text>
+        )}
+
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing="md">
-          {categoryData.map((cat, idx) => (
+          {realCategoryData.map((cat, idx) => (
             <Card 
               key={idx} 
               component={Link}
-              href={`/attractions?search=${encodeURIComponent(cat.name)}`}
+              href={`/attractions?category=${encodeURIComponent(cat.name)}`}
               radius="xl" 
               p={0} 
               style={{ height: '220px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
