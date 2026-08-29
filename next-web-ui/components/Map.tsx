@@ -30,12 +30,7 @@ const createCustomIcon = (name: string, isSelected: boolean) => new L.DivIcon({
   className: 'custom-leaflet-marker-with-label',
   html: `
     <div class="${styles.customIconWrapper}">
-      <div class="${styles.customIconDot}" style="
-        border: ${isSelected ? '4px' : '3px'} solid white;
-        width: ${isSelected ? '24px' : '16px'};
-        height: ${isSelected ? '24px' : '16px'};
-        box-shadow: 0 0 ${isSelected ? '10px' : '5px'} rgba(0,0,0,0.5);
-      "></div>
+      <div class="${styles.customIconDot} ${isSelected ? styles.customIconDotSelected : ''}"></div>
       <span class="${styles.customIconLabel}">${name}</span>
     </div>
   `,
@@ -155,27 +150,6 @@ export default function Map({
           ) : null
         ))}
       </MapContainer>
-
-      {/* Global styles for the tooltip override */}
-      <style jsx global>{`
-        .leaflet-tile-pane {
-          filter: sepia(6%) saturate(108%) brightness(1.01);
-        }
-        .leaflet-tooltip {
-          background-color: #FFFFFF !important;
-          border: 1px solid #E4F1EC !important;
-          border-radius: 12px !important;
-          padding: 8px !important;
-          box-shadow: 0 10px 24px rgba(34, 48, 31, 0.16) !important;
-          white-space: normal !important;
-        }
-        .leaflet-tooltip-top:before {
-          border-top-color: #FFFFFF !important;
-        }
-        .leaflet-control-zoom a {
-          color: var(--mantine-primary-color-filled) !important;
-        }
-      `}</style>
     </div>
   );
 }

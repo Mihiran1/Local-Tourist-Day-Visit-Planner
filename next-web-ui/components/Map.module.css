@@ -21,9 +21,20 @@
 
 .customIconDot {
   background-color: var(--mantine-primary-color-filled);
+  border: 3px solid white;
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
   border-radius: 50%;
   transition: all 0.2s ease;
   pointer-events: auto;
+}
+
+.customIconDotSelected {
+  border-width: 4px;
+  width: 24px;
+  height: 24px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 .customIconLabel {
@@ -87,4 +98,26 @@
   border-radius: 999px;
   width: fit-content;
   margin-top: 2px;
+}
+
+/* Global Leaflet Overrides */
+:global(.leaflet-tile-pane) {
+  filter: sepia(6%) saturate(108%) brightness(1.01);
+}
+
+:global(.leaflet-tooltip) {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E4F1EC !important;
+  border-radius: 12px !important;
+  padding: 8px !important;
+  box-shadow: 0 10px 24px rgba(34, 48, 31, 0.16) !important;
+  white-space: normal !important;
+}
+
+:global(.leaflet-tooltip-top:before) {
+  border-top-color: #FFFFFF !important;
+}
+
+:global(.leaflet-control-zoom a) {
+  color: var(--mantine-primary-color-filled) !important;
 }
