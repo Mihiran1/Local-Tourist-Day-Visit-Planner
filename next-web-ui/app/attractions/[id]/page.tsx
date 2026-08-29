@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Container, Title, Text, Button, Group, Box, Image, Grid, Paper, Badge, ThemeIcon, List, ActionIcon, Flex, SimpleGrid } from '@mantine/core';
+import { Container, Title, Text, Button, Group, Box, Image, Grid, Paper, Badge, ThemeIcon, List, ActionIcon, Flex, SimpleGrid, Modal } from '@mantine/core';
 import { IconMapPin, IconClock, IconBulb, IconHeart, IconArrowLeft, IconPhoto } from '@tabler/icons-react';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 import api from '../../../services/api';
 import Navbar from '../../../components/Navbar';
 
@@ -26,6 +27,7 @@ export default function AttractionDetailsPage() {
   const id = params.id;
   const [attraction, setAttraction] = useState<Attraction | null>(null);
   const [loading, setLoading] = useState(true);
+  const [openedImage, setOpenedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAttraction = async () => {
@@ -111,9 +113,9 @@ export default function AttractionDetailsPage() {
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Paper p="xl" radius="md" shadow="sm" withBorder bg="white">
               <Title order={3} mb="md">About this place</Title>
-              <Text style={{ lineHeight: 1.8, fontSize: '1.05rem', whiteSpace: 'pre-wrap' }}>
-                {attraction.description}
-              </Text>
+              <div className="markdown-content">
+                <ReactMarkdown>{attraction.description}</ReactMarkdown>
+              </div>
             </Paper>
 
 
@@ -163,34 +165,95 @@ export default function AttractionDetailsPage() {
                     </ThemeIcon>
                     <Title order={4}>Travel Tips & Safety</Title>
                   </Group>
-                  <Text style={{ lineHeight: 1.6, fontSize: '0.95rem' }}>
-                    {attraction.travelTips}
-                  </Text>
-                </Paper>
-              )}
-
-              {/* Photo Gallery in Sidebar */}
-              {attraction.imageUrls && attraction.imageUrls.length > 1 && (
-                <Paper p="xl" radius="md" shadow="sm" withBorder bg="white" mt="xl">
-                  <Title order={4} mb="md">Photo Gallery</Title>
-                  <SimpleGrid cols={2} spacing="md">
-                    {attraction.imageUrls.slice(1).map((img, idx) => (
-                      <Image 
-                        key={idx}
-                        src={`http://localhost:8080${img}`}
-                        height={120}
-                        radius="md"
-                        fit="cover"
-                        style={{ border: '1px solid #eaeaea' }}
-                      />
-                    ))}
-                  </SimpleGrid>
+                  <div className="markdown-content-sm">
+                    <ReactMarkdown>{attraction.travelTips}</ReactMarkdown>
+                  </div>
                 </Paper>
               )}
             </Box>
           </Grid.Col>
         </Grid>
+
+        {/* Prominent Photo Gallery Section */}
+        {attraction.imageUrls && attraction.imageUrls.length > 1 && (
+          <Box mt={60} mb={40}>
+            <Title order={2} fw={800} mb="lg">Photo Gallery</Title>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
+              {attraction.imageUrls.slice(1).map((img, idx) => (
+                <Image 
+                  key={idx}
+                  src={`http://localhost:8080${img}`}
+                  height={250}
+                  radius="xl"
+                  fit="cover"
+                  style={{ 
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+                  }}
+                  className="gallery-img"
+                  onClick={() => setOpenedImage(img)}
+                />
+              ))}
+            </SimpleGrid>
+          </Box>
+        )}
+
+        {/* Global style for gallery hover effect */}
+        <style jsx global>{`
+          .gallery-img:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15) !important;
+            cursor: pointer;
+          }
+          
+          /* Markdown Styles */
+          .markdown-content, .markdown-content-sm {
+            color: #333;
+          }
+          .markdown-content {
+            line-height: 1.8;
+            font-size: 1.05rem;
+          }
+          .markdown-content-sm {
+            line-height: 1.6;
+            font-size: 0.95rem;
+          }
+          .markdown-content h1, .markdown-content h2, .markdown-content h3, 
+          .markdown-content-sm h1, .markdown-content-sm h2, .markdown-content-sm h3 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #1a1a1a;
+          }
+          .markdown-content p, .markdown-content-sm p {
+            margin-bottom: 1em;
+          }
+          .markdown-content ul, .markdown-content-sm ul {
+            padding-left: 1.5em;
+            margin-bottom: 1em;
+          }
+          .markdown-content li, .markdown-content-sm li {
+            margin-bottom: 0.25em;
+          }
+        `}</style>
       </Container>
+
+      {/* Lightbox Modal */}
+      <Modal 
+        opened={!!openedImage} 
+        onClose={() => setOpenedImage(null)} 
+        size="auto" 
+        centered
+        padding={0}
+        withCloseButton={false}
+      >
+        {openedImage && (
+          <Image 
+            src={`http://localhost:8080${openedImage}`} 
+            style={{ maxHeight: '90vh', maxWidth: '100vw', objectFit: 'contain' }} 
+            onClick={() => setOpenedImage(null)}
+          />
+        )}
+      </Modal>
     </div>
   );
 }
