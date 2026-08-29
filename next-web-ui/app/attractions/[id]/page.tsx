@@ -70,7 +70,7 @@ export default function AttractionDetailsPage() {
           paddingBottom: '40px'
         }}
       >
-        <Container size="lg" w="100%">
+        <Container fluid px={{ base: 'md', lg: 150 }} w="100%">
           <Button 
             component={Link} 
             href="/" 
@@ -105,7 +105,7 @@ export default function AttractionDetailsPage() {
       </Box>
 
       {/* Content Section */}
-      <Container size="lg" mt={40}>
+      <Container fluid px={{ base: 'md', lg: 150 }} mt={40}>
         <Grid>
           {/* Main Description */}
           <Grid.Col span={{ base: 12, md: 8 }}>
@@ -116,74 +116,78 @@ export default function AttractionDetailsPage() {
               </Text>
             </Paper>
 
-            {/* Travel Tips */}
-            {attraction.travelTips && (
-              <Paper p="xl" radius="md" shadow="sm" withBorder bg="white" mt="xl">
-                <Group mb="md">
-                  <ThemeIcon color="yellow" size="lg" radius="xl" variant="light">
-                    <IconBulb size={20} />
-                  </ThemeIcon>
-                  <Title order={3}>Travel Tips & Safety</Title>
-                </Group>
-                <Text style={{ lineHeight: 1.8, fontSize: '1.05rem' }}>
-                  {attraction.travelTips}
-                </Text>
-              </Paper>
-            )}
 
-            {/* Photo Gallery (if more than 1 image) */}
-            {attraction.imageUrls && attraction.imageUrls.length > 1 && (
-              <Box mt="xl">
-                <Title order={3} mb="md">Photo Gallery</Title>
-                <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
-                  {attraction.imageUrls.slice(1).map((img, idx) => (
-                    <Image 
-                      key={idx}
-                      src={`http://localhost:8080${img}`}
-                      height={180}
-                      radius="md"
-                      fit="cover"
-                      style={{ border: '1px solid #eaeaea' }}
-                    />
-                  ))}
-                </SimpleGrid>
-              </Box>
-            )}
           </Grid.Col>
 
           {/* Sidebar Info */}
           <Grid.Col span={{ base: 12, md: 4 }}>
-            <Paper p="xl" radius="md" shadow="sm" withBorder bg="white" style={{ position: 'sticky', top: '20px' }}>
-              <Title order={4} mb="lg">Quick Information</Title>
-              
-              <List spacing="lg" size="sm" center>
-                <List.Item
-                  icon={<ThemeIcon size={28} radius="xl" variant="light"><IconClock size={16} /></ThemeIcon>}
-                >
-                  <Text fw={600}>Opening Hours</Text>
-                  <Text c="dimmed">{attraction.openingTime || 'Always Open'}</Text>
-                </List.Item>
+            <Box style={{ position: 'sticky', top: '20px' }}>
+              <Paper p="xl" radius="md" shadow="sm" withBorder bg="white">
+                <Title order={4} mb="lg">Quick Information</Title>
+                
+                <List spacing="lg" size="sm" center>
+                  <List.Item
+                    icon={<ThemeIcon size={28} radius="xl" variant="light"><IconClock size={16} /></ThemeIcon>}
+                  >
+                    <Text fw={600}>Opening Hours</Text>
+                    <Text c="dimmed">{attraction.openingTime || 'Always Open'}</Text>
+                  </List.Item>
 
-                <List.Item
-                  icon={<ThemeIcon color="blue" size={28} radius="xl" variant="light"><IconMapPin size={16} /></ThemeIcon>}
-                >
-                  <Text fw={600}>Location</Text>
-                  <Text c="dimmed">{attraction.distance}</Text>
-                  {attraction.latitude && attraction.longitude && (
-                    <Text size="xs" c="dimmed" mt={4}>
-                      GPS: {attraction.latitude}, {attraction.longitude}
-                    </Text>
-                  )}
-                </List.Item>
+                  <List.Item
+                    icon={<ThemeIcon color="blue" size={28} radius="xl" variant="light"><IconMapPin size={16} /></ThemeIcon>}
+                  >
+                    <Text fw={600}>Location</Text>
+                    <Text c="dimmed">{attraction.distance}</Text>
+                    {attraction.latitude && attraction.longitude && (
+                      <Text size="xs" c="dimmed" mt={4}>
+                        GPS: {attraction.latitude}, {attraction.longitude}
+                      </Text>
+                    )}
+                  </List.Item>
 
-                <List.Item
-                  icon={<ThemeIcon color="grape" size={28} radius="xl" variant="light"><IconPhoto size={16} /></ThemeIcon>}
-                >
-                  <Text fw={600}>Photos</Text>
-                  <Text c="dimmed">{attraction.imageUrls?.length || 0} Images available</Text>
-                </List.Item>
-              </List>
-            </Paper>
+                  <List.Item
+                    icon={<ThemeIcon color="grape" size={28} radius="xl" variant="light"><IconPhoto size={16} /></ThemeIcon>}
+                  >
+                    <Text fw={600}>Photos</Text>
+                    <Text c="dimmed">{attraction.imageUrls?.length || 0} Images available</Text>
+                  </List.Item>
+                </List>
+              </Paper>
+
+              {/* Travel Tips in Sidebar */}
+              {attraction.travelTips && (
+                <Paper p="xl" radius="md" shadow="sm" withBorder bg="white" mt="xl">
+                  <Group mb="md">
+                    <ThemeIcon color="yellow" size="lg" radius="xl" variant="light">
+                      <IconBulb size={20} />
+                    </ThemeIcon>
+                    <Title order={4}>Travel Tips & Safety</Title>
+                  </Group>
+                  <Text style={{ lineHeight: 1.6, fontSize: '0.95rem' }}>
+                    {attraction.travelTips}
+                  </Text>
+                </Paper>
+              )}
+
+              {/* Photo Gallery in Sidebar */}
+              {attraction.imageUrls && attraction.imageUrls.length > 1 && (
+                <Paper p="xl" radius="md" shadow="sm" withBorder bg="white" mt="xl">
+                  <Title order={4} mb="md">Photo Gallery</Title>
+                  <SimpleGrid cols={2} spacing="md">
+                    {attraction.imageUrls.slice(1).map((img, idx) => (
+                      <Image 
+                        key={idx}
+                        src={`http://localhost:8080${img}`}
+                        height={120}
+                        radius="md"
+                        fit="cover"
+                        style={{ border: '1px solid #eaeaea' }}
+                      />
+                    ))}
+                  </SimpleGrid>
+                </Paper>
+              )}
+            </Box>
           </Grid.Col>
         </Grid>
       </Container>

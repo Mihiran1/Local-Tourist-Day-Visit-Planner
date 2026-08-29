@@ -27,14 +27,14 @@ public class Attraction {
     @Column(nullable = false)
     private String category; // උදා: Nature, Religious, Heritage
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String distance; // උදා: "20km"
 
     private String openingTime;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String travelTips;
 
     // Map එකේ පෙන්වන්න ඛණ්ඩාංක (Coordinates)
