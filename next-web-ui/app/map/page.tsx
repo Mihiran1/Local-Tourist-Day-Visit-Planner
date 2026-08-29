@@ -7,6 +7,7 @@ import { IconArrowLeft, IconMapPin, IconSearch, IconLocation } from '@tabler/ico
 import Link from 'next/link';
 import api from '../../services/api';
 import Navbar from '../../components/Navbar';
+import styles from './page.module.css';
 
 const MapComponent = dynamic(() => import('../../components/Map'), { 
   ssr: false, 
@@ -123,12 +124,12 @@ export default function MapPage() {
       <Flex flex={1} style={{ overflow: 'hidden' }}>
         
         {/* Left Sidebar - List View */}
-        <Box w={{ base: '100%', md: 400 }} h="100%" bg="white" style={{ borderRight: '1px solid #eaeaea', zIndex: 10, display: 'flex', flexDirection: 'column' }}>
+        <Box w={{ base: '100%', md: 400 }} h="100%" bg="white" className={styles.sidebar}>
           
           {/* Sidebar Header */}
-          <Box p="md" style={{ borderBottom: '1px solid #eaeaea' }}>
-            <Group mb="md">
-              <ActionIcon component={Link} href="/" variant="subtle" color="dark">
+          <Box p="md" className={styles.sidebarHeader}>
+            <Group mb="md" align="center">
+              <ActionIcon component={Link} href="/" variant="light" size="lg" radius="md">
                 <IconArrowLeft size={20} />
               </ActionIcon>
               <Box>
@@ -140,7 +141,7 @@ export default function MapPage() {
             <TextInput 
               placeholder="Search places..." 
               leftSection={<IconSearch size={16} />}
-              radius="xl"
+              radius="md"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
             />
@@ -154,67 +155,63 @@ export default function MapPage() {
               <Text ta="center" mt="xl" c="dimmed">No places found.</Text>
             ) : (
               <Flex direction="column" gap="sm">
+                
                 {/* Always show the Center Reference */}
                 <Box 
                   p="md" 
-                  style={{ 
-                    borderRadius: '8px', 
-                    border: '1px solid #ffe8e6', 
-                    backgroundColor: '#fff5f5', 
-                    cursor: 'pointer' 
-                  }}
+                  className={styles.centerBox}
                   onClick={() => setSelectedId(null)}
                 >
                   <Group gap="sm" wrap="nowrap">
-                    <ActionIcon color="red" variant="light" size="lg" radius="xl">
+                    <ActionIcon color="red" variant="light" size="lg" radius="md">
                       <IconLocation size={20} />
                     </ActionIcon>
                     <Box>
-                      <Text fw={700} size="sm" c="red.9">Dehiattakandiya Center</Text>
+                      <Text fw={600} size="sm" c="red.9">Dehiattakandiya Center</Text>
                       <Text size="xs" c="red.7">Your base location</Text>
                     </Box>
                   </Group>
                 </Box>
 
                 {/* Attraction List */}
-                {filteredAttractions.map(attr => (
-                  <Box 
-                    key={attr.id} 
-                    p="sm" 
-                    style={{ 
-                      borderRadius: '8px', 
-                      border: selectedId === attr.id ? '2px solid var(--mantine-primary-color-filled)' : '1px solid #eaeaea', 
-                      backgroundColor: selectedId === attr.id ? '#f3fcf6' : 'white',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onClick={() => setSelectedId(attr.id)}
-                  >
-                    <Group gap="sm" wrap="nowrap">
-                      {attr.imageUrls && attr.imageUrls.length > 0 ? (
-                        <div style={{ width: 60, height: 60, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
-                          <img src={`http://localhost:8080${attr.imageUrls[0]}`} alt={attr.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                      ) : (
-                        <ActionIcon variant="light" size={60} radius="md">
-                          <IconMapPin size={24} />
-                        </ActionIcon>
-                      )}
-                      
-                      <Box style={{ flex: 1, overflow: 'hidden' }}>
-                        <Text fw={600} size="sm" lineClamp={1}>{attr.name}</Text>
-                        <Text size="xs" c="dimmed" lineClamp={1}>{attr.category}</Text>
-                        <Group gap={4} mt={4}>
-                          <Badge size="xs" variant="light" color="gray">
-                            {attr.calculatedDistance < 1 
-                              ? `${Math.round(attr.calculatedDistance * 1000)} m` 
-                              : `${attr.calculatedDistance.toFixed(1)} km`} away
+                {filteredAttractions.map(attr => {
+                  const isSelected = selectedId === attr.id;
+                  return (
+                    <Box 
+                      key={attr.id} 
+                      p="sm" 
+                      className={`${styles.attractionBox} ${isSelected ? styles.attractionBoxSelected : ''}`}
+                      onClick={() => setSelectedId(attr.id)}
+                    >
+                      <Group gap="sm" wrap="nowrap" align="flex-start">
+                        {attr.imageUrls && attr.imageUrls.length > 0 ? (
+                          <div className={styles.imageWrapper}>
+                            <img src={`http://localhost:8080${attr.imageUrls[0]}`} alt={attr.name} className={styles.image} />
+                          </div>
+                        ) : (
+                          <ActionIcon variant="light" size={60} radius="md" style={{ flexShrink: 0 }}>
+                            <IconMapPin size={24} />
+                          </ActionIcon>
+                        )}
+                        
+                        <Box className={styles.infoWrapper}>
+                          <Text fw={600} size="sm" lineClamp={1}>{attr.name}</Text>
+                          <Badge size="sm" variant="light" color="teal" mt={4} mb={4}>
+                            {attr.category}
                           </Badge>
-                        </Group>
-                      </Box>
-                    </Group>
-                  </Box>
-                ))}
+                          <Group gap={4}>
+                            <IconLocation size={14} color="gray" />
+                            <Text size="xs" c="dimmed" fw={500}>
+                              {attr.calculatedDistance < 1 
+                                ? `${Math.round(attr.calculatedDistance * 1000)} m away` 
+                                : `${attr.calculatedDistance.toFixed(1)} km away`}
+                            </Text>
+                          </Group>
+                        </Box>
+                      </Group>
+                    </Box>
+                  );
+                })}
               </Flex>
             )}
           </ScrollArea>

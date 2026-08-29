@@ -1,0 +1,90 @@
+.mapWrapper {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  position: relative;
+}
+
+.mapContainer {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.customIconWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  pointer-events: none;
+}
+
+.customIconDot {
+  background-color: var(--mantine-primary-color-filled);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.customIconLabel {
+  background: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--mantine-primary-color-filled);
+  pointer-events: auto;
+}
+
+.centerIconDot {
+  background-color: var(--mantine-color-red-6);
+  border: 4px solid white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(250, 82, 82, 0.8);
+}
+
+.tooltipContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 210px;
+  padding: 6px;
+}
+
+.tooltipImage {
+  width: 100%;
+  height: 104px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.tooltipTitle {
+  font-size: 14px;
+  color: #22301f;
+  font-weight: 600;
+}
+
+.tooltipCategory {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mantine-color-teal-9);
+  background-color: var(--mantine-color-teal-0);
+  padding: 2px 8px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.tooltipDistance {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background-color: var(--mantine-color-orange-0);
+  color: var(--mantine-color-orange-9);
+  padding: 3px 8px;
+  border-radius: 999px;
+  width: fit-content;
+  margin-top: 2px;
+}
