@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex, Grid, ThemeIcon, List } from '@mantine/core';
-import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking, IconInfoCircle } from '@tabler/icons-react';
+import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex, Grid, ThemeIcon, List, Paper, Timeline } from '@mantine/core';
+import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking, IconInfoCircle, IconCalendarEvent, IconCirclePlus, IconClock, IconBookmark } from '@tabler/icons-react';
 import Link from 'next/link';
+import { useTripPlan } from '../context/TripPlanContext';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import api from '../services/api';
@@ -28,6 +29,7 @@ export default function HomePage() {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
+  const { addToPlan } = useTripPlan();
   
   const backgrounds = [bg1.src, bg2.src, bg3.src];
 
@@ -149,6 +151,102 @@ export default function HomePage() {
         </Container>
       </Box>
 
+      {/* Plan Your Perfect Day Trip Banner */}
+      <Container fluid px={{ base: 'md', lg: 150 }} mt={80}>
+        <Paper p={{ base: 'xl', md: 50 }} radius="xl" bg="darkGreen.9" c="white" style={{ position: 'relative', overflow: 'hidden' }}>
+          {/* Subtle background gradient overlay for the banner */}
+          <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40%', background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)' }} />
+          
+          <Grid align="center" gutter={40}>
+            {/* Left Content */}
+            <Grid.Col span={{ base: 12, md: 5 }}>
+              <Group gap="xs" mb="md">
+                <ThemeIcon color="teal.5" variant="light" size="sm" radius="xl">
+                  <IconCalendarEvent size={14} />
+                </ThemeIcon>
+                <Text size="sm" fw={700} c="teal.4" tt="uppercase" letterSpacing={1}>One-Day Planning</Text>
+              </Group>
+              <Title order={2} size="2.5rem" fw={900} mb="md" style={{ lineHeight: 1.2 }}>
+                Plan Your Perfect Day Trip
+              </Title>
+              <Text size="md" c="gray.4" mb="xl" style={{ lineHeight: 1.6 }}>
+                Create a personalized one-day itinerary. Pick attractions, see estimated times, view your route on the map and save your plan.
+              </Text>
+              <Group>
+                <Button 
+                  component={Link} 
+                  href="/plan" 
+                  color="teal.5" 
+                  radius="xl" 
+                  size="md"
+                  leftSection={<IconPlus size={16} />}
+                >
+                  Create a Visit Plan
+                </Button>
+                <Button 
+                  variant="outline" 
+                  color="gray.4" 
+                  radius="xl" 
+                  size="md"
+                >
+                  Learn More
+                </Button>
+              </Group>
+            </Grid.Col>
+
+            {/* Middle Feature Cards */}
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <SimpleGrid cols={2} spacing="md">
+                <Paper p="md" radius="md" bg="rgba(255,255,255,0.05)" withBorder style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+                  <ThemeIcon color="teal.5" variant="transparent" mb="sm"><IconSearch size={24} /></ThemeIcon>
+                  <Text fw={600} size="sm" mb={4}>Discover Places</Text>
+                  <Text size="xs" c="gray.5">Browse and search local attractions that interest you.</Text>
+                </Paper>
+                <Paper p="md" radius="md" bg="rgba(255,255,255,0.05)" withBorder style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+                  <ThemeIcon color="teal.5" variant="transparent" mb="sm"><IconCirclePlus size={24} /></ThemeIcon>
+                  <Text fw={600} size="sm" mb={4}>Build Your Plan</Text>
+                  <Text size="xs" c="gray.5">Add attractions to your one-day visit plan in your preferred order.</Text>
+                </Paper>
+                <Paper p="md" radius="md" bg="rgba(255,255,255,0.05)" withBorder style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+                  <ThemeIcon color="teal.5" variant="transparent" mb="sm"><IconClock size={24} /></ThemeIcon>
+                  <Text fw={600} size="sm" mb={4}>Get a Timeline</Text>
+                  <Text size="xs" c="gray.5">See estimated visit durations and travel time between places.</Text>
+                </Paper>
+                <Paper p="md" radius="md" bg="rgba(255,255,255,0.05)" withBorder style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+                  <ThemeIcon color="teal.5" variant="transparent" mb="sm"><IconBookmark size={24} /></ThemeIcon>
+                  <Text fw={600} size="sm" mb={4}>Save & Share</Text>
+                  <Text size="xs" c="gray.5">Save your plan and revisit it anytime after logging in.</Text>
+                </Paper>
+              </SimpleGrid>
+            </Grid.Col>
+
+            {/* Right Sample Timeline */}
+            <Grid.Col span={{ base: 12, md: 3 }}>
+              <Paper p="lg" radius="md" bg="rgba(255,255,255,0.05)" withBorder style={{ borderColor: 'rgba(255,255,255,0.1)', height: '100%' }}>
+                <Group gap="xs" mb="lg">
+                  <IconClock size={16} color="var(--mantine-color-gray-4)" />
+                  <Text size="sm" c="gray.4" fw={600}>Sample Timeline</Text>
+                </Group>
+                <Timeline active={4} bulletSize={10} lineWidth={2} color="teal.5">
+                  <Timeline.Item title="09:00" styles={{ itemTitle: { fontSize: '0.8rem', color: '#fff' } }}>
+                    <Text size="xs" c="gray.4" mt={2}>Kudagala Temple</Text>
+                  </Timeline.Item>
+                  <Timeline.Item title="11:30" styles={{ itemTitle: { fontSize: '0.8rem', color: '#fff' } }}>
+                    <Text size="xs" c="gray.4" mt={2}>Maduru Oya NP</Text>
+                  </Timeline.Item>
+                  <Timeline.Item title="14:00" styles={{ itemTitle: { fontSize: '0.8rem', color: '#fff' } }}>
+                    <Text size="xs" c="gray.4" mt={2}>Ancient Sluice</Text>
+                  </Timeline.Item>
+                  <Timeline.Item title="16:30" styles={{ itemTitle: { fontSize: '0.8rem', color: '#fff' } }}>
+                    <Text size="xs" c="gray.4" mt={2}>Henanigala Viharaya</Text>
+                  </Timeline.Item>
+                </Timeline>
+              </Paper>
+            </Grid.Col>
+          </Grid>
+        </Paper>
+      </Container>
+
       {/* Popular Places Section */}
       <Container fluid px={{ base: 'md', lg: 150 }} mt={80}>
         <Group justify="space-between" align="flex-end" mb="xl">
@@ -230,7 +328,12 @@ export default function HomePage() {
                         leftSection={<IconPlus size={14} />}
                         onClick={(e) => {
                           e.preventDefault();
-                          alert('Please Login to add to your plan!');
+                          addToPlan({
+                            id: attraction.id,
+                            name: attraction.name,
+                            category: attraction.category,
+                            imageUrl: firstImage
+                          });
                         }}
                       >
                         Add to Plan

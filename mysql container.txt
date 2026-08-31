@@ -1,0 +1,8 @@
+mysql container 
+
+docker ps
+docker start auth-mysql
+docker ps
+docker exec -it auth-mysql mysql -u root -p
+
+password: yourpassword

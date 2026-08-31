@@ -8,6 +8,8 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import api from '../../../services/api';
 import Navbar from '../../../components/Navbar';
+import { useTripPlan } from '../../../context/TripPlanContext';
+
 
 interface Attraction {
   id: number;
@@ -25,6 +27,7 @@ interface Attraction {
 export default function AttractionDetailsPage() {
   const params = useParams();
   const id = params.id;
+  const { addToPlan } = useTripPlan();
   const [attraction, setAttraction] = useState<Attraction | null>(null);
   const [loading, setLoading] = useState(true);
   const [openedImage, setOpenedImage] = useState<string | null>(null);
@@ -94,13 +97,20 @@ export default function AttractionDetailsPage() {
               </Flex>
             </div>
             <Button 
-              color="red" 
+              color="darkGreen.9" 
               size="lg" 
               radius="md" 
               leftSection={<IconHeart size={20} />}
-              onClick={() => alert("Please Login to save to Favorites!")}
+              onClick={() => {
+                addToPlan({
+                  id: attraction.id,
+                  name: attraction.name,
+                  category: attraction.category,
+                  imageUrl: heroImage
+                });
+              }}
             >
-              Save to Favorites
+              Add to Plan
             </Button>
           </Group>
         </Container>

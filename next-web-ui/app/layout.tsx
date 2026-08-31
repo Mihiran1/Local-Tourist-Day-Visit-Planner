@@ -4,6 +4,7 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { AuthProvider } from '../context/AuthContext';
 import "./globals.css";
+import { TripPlanProvider } from "@/context/TripPlanContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,7 +44,9 @@ export default function RootLayout({
         {/* 2. අපි හදපු ඒ Theme එක මෙතනින් මුළු App එකටම Apply කරනවා */}
         <MantineProvider theme={theme}>
           <AuthProvider>
+             <TripPlanProvider>   
             {children}
+            </TripPlanProvider>
           </AuthProvider>
         </MantineProvider>
       </body>
