@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex, Grid, ThemeIcon, List, Paper, Timeline } from '@mantine/core';
-import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking, IconInfoCircle, IconCalendarEvent, IconCirclePlus, IconClock, IconBookmark } from '@tabler/icons-react';
+import { useState, useEffect, useRef } from 'react';
+import { Container, Title, Text, Button, Group, TextInput, Box, SimpleGrid, Card, Badge, Flex, Grid, ThemeIcon, List, Paper, Timeline, ActionIcon } from '@mantine/core';
+import { IconSearch, IconMapPin, IconArrowRight, IconPlus, IconTree, IconBuildingChurch, IconBuildingMonument, IconMasksTheater, IconTrekking, IconInfoCircle, IconCalendarEvent, IconCirclePlus, IconClock, IconBookmark, IconToolsKitchen2, IconBuildingFactory, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useTripPlan } from '../context/TripPlanContext';
 import { useRouter } from 'next/navigation';
@@ -32,6 +32,20 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const { addToPlan } = useTripPlan();
+  
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (categoryScrollRef.current) {
+      categoryScrollRef.current.scrollBy({ left: -600, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (categoryScrollRef.current) {
+      categoryScrollRef.current.scrollBy({ left: 600, behavior: 'smooth' });
+    }
+  };
   
   const backgrounds = [bg1.src, bg2.src, bg3.src];
 
@@ -66,23 +80,20 @@ export default function HomePage() {
   const popularAttractions = attractions.slice(0, 4);
 
   const categoryData = [
-    { name: 'Nature & Wildlife', count: 24, icon: <IconTree size={16} />, image: 'https://images.unsplash.com/photo-1613289052028-c1195a62e088?q=80&w=600&auto=format&fit=crop' },
-    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: 'https://images.unsplash.com/photo-1549473889-14f410d83298?q=80&w=600&auto=format&fit=crop' },
-    { name: 'Heritage Sites', count: 12, icon: <IconBuildingMonument size={16} />, image: 'https://images.unsplash.com/photo-1587826388487-19c6f2d25d19?q=80&w=600&auto=format&fit=crop' },
-    { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: 'https://images.unsplash.com/photo-1610093674387-9ee9440bc4c4?q=80&w=600&auto=format&fit=crop' },
-    { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=600&auto=format&fit=crop' },
+    { name: 'Nature & Wildlife', count: 24, icon: <IconTree size={16} />, image: '/ca1.png' },
+    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: '/2.png' },
+    { name: 'Heritage Sites', count: 12, icon: <IconBuildingMonument size={16} />, image: '/3.png' },
+    { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: '/4.png' },
+    { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: '/5.png' },
+    { name: 'Industrial/Education', count: 5, icon: <IconBuildingFactory size={16} />, image: '/dak1.jpeg' },
+    { name: 'Restaurant', count: 8, icon: <IconToolsKitchen2 size={16} />, image: '/dak2.jpeg' },
   ];
 
-  const uniqueCategories = Array.from(new Set(attractions.map(a => a.category).filter(Boolean)));
-  const realCategoryData = uniqueCategories.map(catName => {
-    const count = attractions.filter(a => a.category === catName).length;
-    // Find matching static data for icon and image
-    const staticData = categoryData.find(c => c.name.toLowerCase() === catName.toLowerCase());
+  const realCategoryData = categoryData.map(cat => {
+    const count = attractions.filter(a => a.category.toLowerCase() === cat.name.toLowerCase()).length;
     return {
-      name: catName,
-      count,
-      icon: staticData ? staticData.icon : <IconTree size={16} />,
-      image: staticData ? staticData.image : 'https://images.unsplash.com/photo-1613289052028-c1195a62e088?q=80&w=600&auto=format&fit=crop'
+      ...cat,
+      count
     };
   });
 
@@ -126,7 +137,7 @@ export default function HomePage() {
             Explore the Hidden Beauty of Dehiattakandiya
           </Title>
           <Text size="xl" mb="xl" c="gray.2">
-            Discover breathtaking landscapes, sacred temples, and amazing wildlife in one of Sri Lanka's most beautiful destinations.
+            Discover breathtaking landscapes, sacred temples, and amazing wildlife in one of Sri Lanka&apos;s most beautiful destinations.
           </Text>
           <Group justify="center">
             <TextInput
@@ -331,44 +342,84 @@ export default function HomePage() {
           <Text c="dimmed">No categories available.</Text>
         )}
 
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing="md">
-          {realCategoryData.map((cat, idx) => (
-            <Card 
-              key={idx} 
-              component={Link}
-              href={`/attractions?category=${encodeURIComponent(cat.name)}`}
-              radius="xl" 
-              p={0} 
-              style={{ height: '220px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
-            >
-              <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                backgroundImage: `url(${cat.image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                transition: 'transform 0.3s ease',
-              }} className="cat-img" />
-              
-              <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)'
-              }} />
-              
-              <Flex direction="column" justify="flex-end" h="100%" p="lg" style={{ position: 'relative', zIndex: 1, color: 'white' }}>
-                <Group gap="xs" mb={4}>
-                  {cat.icon}
-                  <Text fw={600} size="md">{cat.name}</Text>
-                </Group>
-                <Text size="xs" opacity={0.7}>{cat.count} Places</Text>
-              </Flex>
-            </Card>
-          ))}
-        </SimpleGrid>
+        <Box style={{ position: 'relative', padding: '0 60px' }}>
+          <ActionIcon 
+            variant="filled"
+            color="darkGreen.9" 
+            size="xl" 
+            radius="xl" 
+            onClick={scrollLeft}
+            style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+          >
+            <IconChevronLeft size={24} />
+          </ActionIcon>
 
-        {/* Global style for hover effect on category cards */}
+          <Box 
+            ref={categoryScrollRef}
+            style={{ 
+              display: 'flex', 
+              overflowX: 'auto', 
+              scrollBehavior: 'smooth',
+              gap: '16px',
+              paddingBottom: '16px',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+            className="hide-scrollbar"
+          >
+            {realCategoryData.map((cat, idx) => (
+              <Box key={idx} style={{ flex: '0 0 calc(20% - 13px)', minWidth: '220px' }}>
+                <Card 
+                  component={Link}
+                  href={`/attractions?category=${encodeURIComponent(cat.name)}`}
+                  radius="xl" 
+                  p={0} 
+                  style={{ height: '220px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
+                >
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundImage: `url(${cat.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    transition: 'transform 0.3s ease',
+                  }} className="cat-img" />
+                  
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)'
+                  }} />
+                  
+                  <Flex direction="column" justify="flex-end" h="100%" p="lg" style={{ position: 'relative', zIndex: 1, color: 'white' }}>
+                    <Group gap="xs" mb={4}>
+                      {cat.icon}
+                      <Text fw={600} size="md">{cat.name}</Text>
+                    </Group>
+                    <Text size="xs" opacity={0.7}>{cat.count} Places</Text>
+                  </Flex>
+                </Card>
+              </Box>
+            ))}
+          </Box>
+
+          <ActionIcon 
+            variant="filled"
+            color="darkGreen.9" 
+            size="xl" 
+            radius="xl" 
+            onClick={scrollRight}
+            style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+          >
+            <IconChevronRight size={24} />
+          </ActionIcon>
+        </Box>
+
+        {/* Global style for hover effect on category cards and hiding scrollbar */}
         <style jsx global>{`
           .mantine-Card-root:hover .cat-img {
             transform: scale(1.1);
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;
           }
         `}</style>
       </Container>

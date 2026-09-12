@@ -38,7 +38,8 @@ function AttractionsContent() {
     fetchAttractions();
   }, []);
 
-  const uniqueCategories = Array.from(new Set(attractions.map(a => a.category).filter(Boolean)));
+  const defaultCategories = ['Nature & Wildlife', 'Religious & Sacred', 'Heritage Sites', 'Cultural', 'Adventure', 'Industrial/Education', 'Restaurant'];
+  const uniqueCategories = Array.from(new Set([...defaultCategories, ...attractions.map(a => a.category).filter(Boolean)]));
 
   const filteredAttractions = attractions.filter((attraction) => {
     const matchesSearch = attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) || 

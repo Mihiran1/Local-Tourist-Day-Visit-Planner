@@ -56,11 +56,26 @@ function MapController({
 }) {
   const map = useMap();
   useEffect(() => {
-    if (selectedMarker?.lat && selectedMarker?.lng) {
-      map.flyTo([selectedMarker.lat, selectedMarker.lng], 14, { duration: 1.5 });
-    } else if (center && center.length === 2) {
-      map.flyTo([center[0], center[1]], zoom, { duration: 1.5 });
-    }
+    if (!map) return;
+    const timeoutId = setTimeout(() => {
+      try {
+        if (selectedMarker?.lat && selectedMarker?.lng) {
+          map.flyTo([selectedMarker.lat, selectedMarker.lng], 14, { duration: 1.5 });
+        } else if (center && center.length === 2) {
+          map.flyTo([center[0], center[1]], zoom, { duration: 1.5 });
+        }
+      } catch (err) {
+        // Fallback if animation fails due to DOM state
+        try {
+          if (selectedMarker?.lat && selectedMarker?.lng) {
+            map.setView([selectedMarker.lat, selectedMarker.lng], 14);
+          } else if (center && center.length === 2) {
+            map.setView([center[0], center[1]], zoom);
+          }
+        } catch (e) {}
+      }
+    }, 100);
+    return () => clearTimeout(timeoutId);
   }, [center?.[0], center?.[1], zoom, selectedMarker?.lat, selectedMarker?.lng, map]);
   return null;
 }
