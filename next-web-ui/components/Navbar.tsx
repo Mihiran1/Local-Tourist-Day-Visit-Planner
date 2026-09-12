@@ -12,36 +12,40 @@ export default function Navbar() {
 
   return (
     <div style={{ borderBottom: '1px solid #eaeaea', backgroundColor: '#ffffff' }}>
-      <Container size="lg" h={70}>
+      <Container fluid px={{ base: 'md', lg: 150 }} h={70}>
         <Group justify="space-between" h="100%">
           
-          <Group gap="xl">
+          {/* Left: Logo */}
+          <Group>
             <Link href="/">
               <Image 
                 src="/4.png" 
                 alt="Travel LK Logo" 
-                h={40} 
+                h={45} 
                 fit="contain" 
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', transition: 'transform 0.2s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               />
             </Link>
-
-            <Group gap="lg" visibleFrom="sm" ml="xl">
-              <Button component={Link} href="/" variant="subtle" color="dark">Home</Button>
-              <Button component={Link} href="/attractions" variant="subtle" color="dark">All Places</Button>
-              <Button component={Link} href="/map" variant="subtle" color="dark">Map View</Button>
-              <Button component={Link} href="/about" variant="subtle" color="dark">About</Button>
-            </Group>
           </Group>
 
-          {/* දකුණු පැත්ත: Buttons හෝ Profile එක */}
+          {/* Center: Navigation Links */}
+          <Group gap="md" visibleFrom="sm">
+            <Button component={Link} href="/" variant="subtle" color="dark" radius="xl" fw={600}>Home</Button>
+            <Button component={Link} href="/attractions" variant="subtle" color="dark" radius="xl" fw={600}>All Places</Button>
+            <Button component={Link} href="/map" variant="subtle" color="dark" radius="xl" fw={600}>Map View</Button>
+            <Button component={Link} href="/about" variant="subtle" color="dark" radius="xl" fw={600}>About</Button>
+          </Group>
+
+          {/* Right: Auth Buttons / Profile */}
           <Group>
             {!user ? (
-              // ලොග් වෙලා නැති සාමාන්‍ය කෙනෙක්ට පේන විදිය
               <>
-                <Button variant="default" onClick={() => router.push('/login')}>Log in</Button>
-                <Button onClick={() => router.push('/signup')}>Sign up</Button>
+                <Button variant="default" radius="xl" fw={600} onClick={() => router.push('/login')}>Log in</Button>
+                <Button radius="xl" fw={600} color="darkGreen.9" onClick={() => router.push('/signup')}>Sign up</Button>
               </>
+
             ) : (
               // ලොග් වුණු කෙනෙක්ට පේන Profile Menu එක
               <Menu shadow="md" width={200} position="bottom-end">

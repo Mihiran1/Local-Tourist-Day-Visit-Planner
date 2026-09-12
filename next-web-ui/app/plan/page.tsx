@@ -4,7 +4,7 @@ import { Container, Title, Text, Button, Group, Card, ActionIcon, Flex, Badge, T
 import { IconArrowUp, IconArrowDown, IconTrash, IconDeviceFloppy } from '@tabler/icons-react';
 import { useTripPlan } from '../../context/TripPlanContext';
 import { useAuth } from '../../context/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Navbar from '../../components/Navbar';
 import { useRouter } from 'next/navigation';
@@ -21,6 +21,12 @@ export default function PlanPage() {
   const [tripDate, setTripDate] = useState('');
   const [startTime, setStartTime] = useState('09:00');
   const [clearModalOpen, setClearModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    }
+  }, [user, router]);
 
   // Parse start time "HH:MM" into hours and minutes
   const getStartMinutes = () => {
@@ -87,6 +93,10 @@ export default function PlanPage() {
       alert("Failed to save the plan.");
     }
   };
+
+  if (!user) {
+    return null; // Prevents the page from flashing before redirect
+  }
 
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', paddingBottom: '60px' }}>
