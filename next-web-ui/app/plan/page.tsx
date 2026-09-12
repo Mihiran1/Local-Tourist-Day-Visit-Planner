@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Title, Text, Button, Group, Card, ActionIcon, Flex, Badge, TextInput, Paper, Timeline } from '@mantine/core';
+import { Container, Title, Text, Button, Group, Card, ActionIcon, Flex, Badge, TextInput, Paper, Timeline, Modal } from '@mantine/core';
 import { IconArrowUp, IconArrowDown, IconTrash, IconDeviceFloppy } from '@tabler/icons-react';
 import { useTripPlan } from '../../context/TripPlanContext';
 import { useAuth } from '../../context/AuthContext';
@@ -20,6 +20,7 @@ export default function PlanPage() {
   const [planName, setPlanName] = useState('My Awesome Day Trip');
   const [tripDate, setTripDate] = useState('');
   const [startTime, setStartTime] = useState('09:00');
+  const [clearModalOpen, setClearModalOpen] = useState(false);
 
   // Parse start time "HH:MM" into hours and minutes
   const getStartMinutes = () => {
@@ -98,11 +99,7 @@ export default function PlanPage() {
             <Button 
               variant="light" 
               color="red" 
-              onClick={() => {
-                if (confirm('Are you sure you want to clear your current plan and start a new one?')) {
-                  clearPlan();
-                }
-              }}
+              onClick={() => setClearModalOpen(true)}
             >
               Start New Plan
             </Button>
@@ -216,6 +213,29 @@ export default function PlanPage() {
           </div>
         </Flex>
       </Container>
+      
+      {/* Clear Plan Confirmation Modal */}
+      <Modal 
+        opened={clearModalOpen} 
+        onClose={() => setClearModalOpen(false)} 
+        title={<Group gap="xs"><IconTrash color="red" size={24} /><Text fw={700} size="lg">Start New Plan</Text></Group>} 
+        centered
+        size="md"
+        padding="xl"
+        overlayProps={{
+          backgroundOpacity: 0.55,
+          blur: 3,
+        }}
+      >
+        <Text size="md" mb="xl">Are you sure you want to clear your current plan and start a new one? This action cannot be undone and you will lose your current selections.</Text>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={() => setClearModalOpen(false)}>Cancel</Button>
+          <Button color="red" onClick={() => {
+            clearPlan();
+            setClearModalOpen(false);
+          }}>Yes, Clear Plan</Button>
+        </Group>
+      </Modal>
     </div>
   );
 }

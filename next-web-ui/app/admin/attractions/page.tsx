@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Grid, Paper, Title, Text, Button, Group, Checkbox, Stack, Table, Image, ActionIcon, Flex, Badge, MultiSelect, Pagination, Drawer, ScrollArea, Divider } from '@mantine/core';
+import { Container, Grid, Paper, Title, Text, Button, Group, Checkbox, Stack, Table, Image, ActionIcon, Flex, Badge, MultiSelect, Pagination, Drawer, ScrollArea, Divider, Modal } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { IconPlus, IconEye, IconEdit, IconTrash } from '@tabler/icons-react';
 import api from '../../../services/api';
@@ -25,6 +25,10 @@ export default function AttractionsListPage() {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
+  
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [attractionToDelete, setAttractionToDelete] = useState<Attraction | null>(null);
+  
   const [activePage, setPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
@@ -118,16 +122,9 @@ export default function AttractionsListPage() {
             <ActionIcon variant="light" color="yellow" onClick={() => router.push(`/admin/attractions/${element.id}/edit`)}>
               <IconEdit size={16} />
             </ActionIcon>
-            <ActionIcon variant="light" color="red" onClick={async () => {
-              if (confirm('Are you sure you want to delete this attraction?')) {
-                try {
-                  await api.delete(`/admin/attractions/${element.id}`);
-                  setAttractions(attractions.filter(a => a.id !== element.id));
-                } catch(e) {
-                  console.error(e);
-                  alert('Error deleting attraction');
-                }
-              }
+            <ActionIcon variant="light" color="red" onClick={() => {
+                setAttractionToDelete(element);
+                setDeleteModalOpen(true);
             }}><IconTrash size={16} /></ActionIcon>
           </Flex>
         </Table.Td>
@@ -286,6 +283,38 @@ export default function AttractionsListPage() {
           </Stack>
         )}
       </Drawer>
+
+      {/* Delete Confirmation Modal */}
+      <Modal 
+        opened={deleteModalOpen} 
+        onClose={() => setDeleteModalOpen(false)} 
+        title={<Group gap="xs"><IconTrash color="red" size={24} /><Text fw={700} size="lg">Confirm Deletion</Text></Group>} 
+        centered
+        size="md"
+        padding="xl"
+        overlayProps={{
+          backgroundOpacity: 0.55,
+          blur: 3,
+        }}
+      >
+        <Text size="md" mb="xl">Are you sure you want to delete <b>{attractionToDelete?.name}</b>? This action cannot be undone and will permanently remove this destination.</Text>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+          <Button color="red" onClick={async () => {
+            if (attractionToDelete) {
+              try {
+                await api.delete(`/admin/attractions/${attractionToDelete.id}`);
+                setAttractions(attractions.filter(a => a.id !== attractionToDelete.id));
+                setDeleteModalOpen(false);
+                setAttractionToDelete(null);
+              } catch(e) {
+                console.error(e);
+                alert('Error deleting attraction');
+              }
+            }
+          }}>Yes, Delete It</Button>
+        </Group>
+      </Modal>
 
     </Container>
   );
