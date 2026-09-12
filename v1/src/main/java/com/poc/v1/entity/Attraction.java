@@ -46,4 +46,7 @@ public class Attraction {
     @Column(name = "image_url")
     private List<String> imageUrls = new ArrayList<>();
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @OneToMany(mappedBy = "attraction", cascade = CascadeType.REMOVE)
+    private List<VisitPlanItem> visitPlanItems = new ArrayList<>();
 }

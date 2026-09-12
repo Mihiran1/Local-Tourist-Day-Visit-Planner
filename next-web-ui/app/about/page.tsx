@@ -11,12 +11,20 @@ export default function AboutPage() {
       <Navbar />
 
       {/* Header Section */}
-      <Box bg="darkGreen.9" py={80} style={{ textAlign: 'center', color: 'white' }}>
+      <Box 
+        py={100} 
+        style={{ 
+          textAlign: 'center', 
+          color: 'white',
+          background: 'linear-gradient(135deg, var(--mantine-color-darkGreen-9) 0%, var(--mantine-color-darkGreen-8) 50%, var(--mantine-color-darkGreen-7) 100%)',
+          boxShadow: 'inset 0 -10px 20px -10px rgba(0,0,0,0.2)'
+        }}
+      >
         <Container size="md">
-          <Title order={1} size="3.5rem" fw={900} mb="sm">
+          <Title order={1} size="3.5rem" fw={900} mb="sm" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
             About Dehiattakandiya
           </Title>
-          <Text size="xl" opacity={0.9}>
+          <Text size="xl" opacity={0.9} fw={500} style={{ textShadow: '0 1px 5px rgba(0,0,0,0.1)' }}>
             The Hidden Gem of the Mahaweli System C
           </Text>
         </Container>
@@ -50,12 +58,22 @@ export default function AboutPage() {
             </List>
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <Image 
-              src="https://images.unsplash.com/photo-1586880244406-556ebe35f282?q=80&w=800&auto=format&fit=crop" 
-              alt="Dehiattakandiya Landscape" 
-              radius="md" 
-              style={{ boxShadow: 'var(--mantine-shadow-md)' }}
-            />
+            <Flex direction="column" gap="md">
+              <Image 
+                src="/dak1.jpeg" 
+                alt="Dehiattakandiya Landscape" 
+                radius="md" 
+                h={250}
+                style={{ boxShadow: 'var(--mantine-shadow-md)', objectFit: 'cover' }}
+              />
+              <Image 
+                src="/dak2.jpeg" 
+                alt="Dehiattakandiya Nature" 
+                radius="md" 
+                h={250}
+                style={{ boxShadow: 'var(--mantine-shadow-md)', objectFit: 'cover' }}
+              />
+            </Flex>
           </Grid.Col>
         </Grid>
       </Container>
