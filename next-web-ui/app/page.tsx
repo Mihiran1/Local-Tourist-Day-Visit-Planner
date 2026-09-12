@@ -11,6 +11,7 @@ import api from '../services/api';
 import bg1 from '../assets/BG1.png';
 import bg2 from '../assets/BG2.png';
 import bg3 from '../assets/BG3.png';
+import styles from './page.module.css';
 
 const MapComponent = dynamic(() => import('../components/Map'), { ssr: false });
 import Navbar from '../components/Navbar';
@@ -98,41 +99,24 @@ export default function HomePage() {
   });
 
   return (
-    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div className={styles.pageContainer}>
       
       <Navbar />
 
       {/* Hero Section */}
-      <Box 
-        style={{
-          position: 'relative',
-          height: '600px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden'
-        }}
-      >
+      <Box className={styles.heroBox}>
         {backgrounds.map((bg, index) => (
           <div
             key={index}
+            className={styles.heroBackground}
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${bg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              opacity: index === bgIndex ? 1 : 0,
-              transition: 'opacity 1.5s ease-in-out',
-              zIndex: 0
+              opacity: index === bgIndex ? 1 : 0
             }}
           />
         ))}
 
-        <Container size="md" style={{ textAlign: 'center', color: 'white', position: 'relative', zIndex: 1 }}>
+        <Container size="md" className={styles.heroContent}>
           <Title order={1} size="4rem" fw={900} mb="md">
             Explore the Hidden Beauty of Dehiattakandiya
           </Title>
@@ -148,14 +132,8 @@ export default function HomePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              style={{ width: '60%', minWidth: '300px' }}
-              styles={{
-                input: {
-                  backgroundColor: 'white',
-                  border: 'none',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                }
-              }}
+              className={styles.searchBar}
+              classNames={{ input: styles.searchInput }}
             />
             <Button size="xl" radius="xl" onClick={handleSearch}>
               Search
@@ -195,21 +173,16 @@ export default function HomePage() {
                 key={attraction.id} 
                 radius="xl" 
                 p={0} 
-                style={{ height: '400px', overflow: 'hidden', position: 'relative' }}
+                className={styles.popularCard}
               >
-                <div style={{
-                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                  backgroundImage: `url(${firstImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }} />
+                <div 
+                  className={styles.cardBackgroundImage}
+                  style={{ backgroundImage: `url(${firstImage})` }} 
+                />
                 {/* Gradient Overlay */}
-                <div style={{
-                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                  background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%)'
-                }} />
+                <div className={`${styles.cardGradientOverlay} ${styles.popularCardGradient}`} />
                 
-                <Flex direction="column" justify="space-between" h="100%" p="lg" style={{ position: 'relative', zIndex: 1, color: 'white' }}>
+                <Flex direction="column" justify="space-between" h="100%" p="lg" className={styles.cardContent}>
                   
                   {/* Top Badges */}
                   <Group justify="space-between">
@@ -275,7 +248,7 @@ export default function HomePage() {
               <Title order={2} fw={800} mb="md" c="darkGreen.9">
                 Welcome to Dehiattakandiya
               </Title>
-              <Text c="dimmed" size="lg" mb="md" style={{ lineHeight: 1.6 }}>
+              <Text c="dimmed" size="lg" mb="md" className={styles.lineHeight16}>
                 Located in the heart of the Mahaweli System C, Dehiattakandiya is a beautiful town surrounded by lush paddy fields, ancient ruins, and rich wildlife. This application is your ultimate day-visit planner to explore the hidden gems of this region.
               </Text>
               
@@ -307,12 +280,7 @@ export default function HomePage() {
             
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Card radius="md" p={0} shadow="md" style={{ overflow: 'hidden' }}>
-                <div style={{
-                  height: '350px',
-                  backgroundImage: 'url(/dak1.jpeg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }} />
+                <div className={styles.aboutImage} />
               </Card>
             </Grid.Col>
           </Grid>
@@ -342,54 +310,39 @@ export default function HomePage() {
           <Text c="dimmed">No categories available.</Text>
         )}
 
-        <Box style={{ position: 'relative', padding: '0 60px' }}>
+        <Box className={styles.sliderContainer}>
           <ActionIcon 
             variant="filled"
             color="darkGreen.9" 
             size="xl" 
             radius="xl" 
             onClick={scrollLeft}
-            style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+            className={styles.sliderArrowLeft}
           >
             <IconChevronLeft size={24} />
           </ActionIcon>
 
           <Box 
             ref={categoryScrollRef}
-            style={{ 
-              display: 'flex', 
-              overflowX: 'auto', 
-              scrollBehavior: 'smooth',
-              gap: '16px',
-              paddingBottom: '16px',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-            className="hide-scrollbar"
+            className={styles.scrollBox}
           >
             {realCategoryData.map((cat, idx) => (
-              <Box key={idx} style={{ flex: '0 0 calc(20% - 13px)', minWidth: '220px' }}>
+              <Box key={idx} className={styles.categoryCardWrapper}>
                 <Card 
                   component={Link}
                   href={`/attractions?category=${encodeURIComponent(cat.name)}`}
                   radius="xl" 
                   p={0} 
-                  style={{ height: '220px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
+                  className={styles.categoryCard}
                 >
-                  <div style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundImage: `url(${cat.image})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    transition: 'transform 0.3s ease',
-                  }} className="cat-img" />
+                  <div 
+                    className={styles.categoryCardImage}
+                    style={{ backgroundImage: `url(${cat.image})` }} 
+                  />
                   
-                  <div style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)'
-                  }} />
+                  <div className={`${styles.cardGradientOverlay} ${styles.categoryCardGradient}`} />
                   
-                  <Flex direction="column" justify="flex-end" h="100%" p="lg" style={{ position: 'relative', zIndex: 1, color: 'white' }}>
+                  <Flex direction="column" justify="flex-end" h="100%" p="lg" className={styles.cardContent}>
                     <Group gap="xs" mb={4}>
                       {cat.icon}
                       <Text fw={600} size="md">{cat.name}</Text>
@@ -407,21 +360,13 @@ export default function HomePage() {
             size="xl" 
             radius="xl" 
             onClick={scrollRight}
-            style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+            className={styles.sliderArrowRight}
           >
             <IconChevronRight size={24} />
           </ActionIcon>
         </Box>
 
-        {/* Global style for hover effect on category cards and hiding scrollbar */}
-        <style jsx global>{`
-          .mantine-Card-root:hover .cat-img {
-            transform: scale(1.1);
-          }
-          .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
+        {/* Hover styles moved to page.module.css */}
       </Container>
 
        {/* Explore on Map Section */}
@@ -447,7 +392,7 @@ export default function HomePage() {
           radius="xl" 
           p={0} 
           withBorder
-          style={{ height: '450px', position: 'relative', overflow: 'hidden' }}
+          className={styles.mapPreviewCard}
         >
           {/* Static semi-interactive map preview */}
           <MapComponent 
@@ -463,19 +408,14 @@ export default function HomePage() {
           />
           
           {/* Bottom Overlay Gradient */}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: '150px',
-            background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%)',
-            pointerEvents: 'none',
-            zIndex: 10
-          }} />
+          <div className={styles.mapGradientOverlay} />
 
           {/* Bottom Content */}
           <Flex 
             justify="space-between" 
             align="flex-end" 
             p="xl" 
-            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 11, pointerEvents: 'none' }}
+            className={styles.mapBottomContent}
           >
             <Box c="white">
               <Title order={3} size="h4" fw={700}>Explore Attractions on Map</Title>
@@ -499,9 +439,9 @@ export default function HomePage() {
       
       {/* Plan Your Perfect Day Trip Banner */}
       <Container fluid px={{ base: 'md', lg: 150 }} mt={80}>
-        <Paper p={{ base: 'xl', md: 50 }} radius="xl" bg="darkGreen.9" c="white" style={{ position: 'relative', overflow: 'hidden' }}>
+        <Paper p={{ base: 'xl', md: 50 }} radius="xl" bg="darkGreen.9" c="white" className={styles.planBanner}>
           {/* Subtle background gradient overlay for the banner */}
-          <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40%', background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)' }} />
+          <div className={styles.planBannerGradient} />
           
           <Grid align="center">
             {/* Left Content */}
@@ -512,10 +452,10 @@ export default function HomePage() {
                 </ThemeIcon>
                 <Text size="sm" fw={700} c="teal.4" tt="uppercase" >One-Day Planning</Text>
               </Group>
-              <Title order={2} size="2.5rem" fw={900} mb="md" style={{ lineHeight: 1.2 }}>
+              <Title order={2} size="2.5rem" fw={900} mb="md" className={styles.lineHeight12}>
                 Plan Your Perfect Day Trip
               </Title>
-              <Text size="md" c="gray.4" mb="xl" style={{ lineHeight: 1.6 }}>
+              <Text size="md" c="gray.4" mb="xl" className={styles.lineHeight16}>
                 Create a personalized one-day itinerary. Pick attractions, see estimated times, view your route on the map and save your plan.
               </Text>
               <Group>
@@ -568,7 +508,7 @@ export default function HomePage() {
 
             {/* Right Sample Timeline */}
             <Grid.Col span={{ base: 12, md: 3 }}>
-              <Paper p="lg" radius="md" bg="rgba(255,255,255,0.05)" withBorder style={{ borderColor: 'rgba(255,255,255,0.1)', height: '100%' }}>
+              <Paper p="lg" radius="md" bg="rgba(255,255,255,0.05)" withBorder className={styles.sampleTimelineBox}>
                 <Group gap="xs" mb="lg">
                   <IconClock size={16} color="var(--mantine-color-gray-4)" />
                   <Text size="sm" c="gray.4" fw={600}>Sample Timeline</Text>
