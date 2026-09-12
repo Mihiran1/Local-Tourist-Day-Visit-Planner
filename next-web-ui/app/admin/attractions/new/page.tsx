@@ -182,7 +182,7 @@ export default function AddAttractionPage() {
                   <Select 
                     label="Category" 
                     placeholder="Select a category" 
-                    data={['Nature & Wildlife', 'Religious & Sacred', 'Heritage Sites', 'Cultural', 'Adventure']} 
+                    data={['Nature & Wildlife', 'Religious & Sacred', 'Heritage Sites', 'Cultural', 'Adventure', 'Industrial/Education', 'Restaurant']} 
                     withAsterisk
                     size="md"
                     leftSection={<IconCategory size={18} style={{ opacity: 0.5 }} />}

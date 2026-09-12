@@ -23,6 +23,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=yourpassword
     depends_on:
       - db
+    volumes:
+      - ./uploads:/app/uploads
 
 volumes:
   db_data:
