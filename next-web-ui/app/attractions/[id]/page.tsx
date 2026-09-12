@@ -106,7 +106,9 @@ export default function AttractionDetailsPage() {
                   id: attraction.id,
                   name: attraction.name,
                   category: attraction.category,
-                  imageUrl: heroImage
+                  imageUrl: heroImage,
+                  lat: attraction.latitude,
+                  lng: attraction.longitude
                 });
               }}
             >

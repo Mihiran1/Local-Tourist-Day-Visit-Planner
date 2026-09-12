@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from 'react';
 import {
   TextInput,
   PasswordInput,
@@ -29,8 +29,11 @@ export default function Login() {
     },
   });
 
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
   const handleLogin = async (values: typeof form.values) => {
     try {
+      setUnverifiedEmail('');
       const response = await api.post('/auth/login', values);
       const { data } = response.data;
       
@@ -45,10 +48,12 @@ export default function Login() {
       }
       
     } catch (error: any) {
-      if (error.response?.data?.message) {
-        form.setErrors({ email: error.response.data.message });
-      } else {
-        form.setErrors({ email: 'An error occurred during login' });
+      const errorMsg = error.response?.data?.message || 'An error occurred during login';
+      form.setErrors({ email: errorMsg });
+      
+      // Check if it's the unverified error
+      if (errorMsg.includes('not verified') || errorMsg.includes('verify your OTP')) {
+        setUnverifiedEmail(values.email);
       }
     }
   };
@@ -99,6 +104,20 @@ export default function Login() {
               Login
             </Button>
           </form>
+
+          {unverifiedEmail && (
+            <Button 
+              fullWidth 
+              mt="md" 
+              size="md" 
+              color="red" 
+              variant="light"
+              radius="md"
+              onClick={() => router.push(`/verify-otp?email=${encodeURIComponent(unverifiedEmail)}`)}
+            >
+              Verify Account Now
+            </Button>
+          )}
 
           <Text c="dimmed" fz={{ base: 'sm', lg: 'md' }} ta="center" mt="xl">
             Don't have an account?{' '}

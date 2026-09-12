@@ -1,18 +1,14 @@
 "use client";
 
 import { Group, Button, Container, Text, Avatar, Menu, UnstyledButton, Image } from '@mantine/core';
-import { IconChevronDown, IconHeart, IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconChevronDown, IconHeart, IconLogout, IconSettings, IconMap2 } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const router = useRouter();
-  
-  // දැනට අපි බොරුවට (Mock) හිතමු User කෙනෙක් ලොග් වෙලා නෑ කියලා. 
-  // (පස්සේ අපි මේක Backend එකෙන් එන ඇත්ත Data වලින් වෙනස් කරනවා)
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
-  const userName = "Mihiran"; // ලොග් වුණු කෙනාගේ නම
+  const { user, logout } = useAuth();
 
   return (
     <div style={{ borderBottom: '1px solid #eaeaea', backgroundColor: '#ffffff' }}>
@@ -40,7 +36,7 @@ export default function Navbar() {
 
           {/* දකුණු පැත්ත: Buttons හෝ Profile එක */}
           <Group>
-            {!isLoggedIn ? (
+            {!user ? (
               // ලොග් වෙලා නැති සාමාන්‍ය කෙනෙක්ට පේන විදිය
               <>
                 <Button variant="default" onClick={() => router.push('/login')}>Log in</Button>
@@ -52,8 +48,8 @@ export default function Navbar() {
                 <Menu.Target>
                   <UnstyledButton>
                     <Group gap={7}>
-                      <Avatar radius="xl">{userName.charAt(0)}</Avatar>
-                      <Text fw={500} size="sm" lh={1} mr={3}>{userName}</Text>
+                      <Avatar radius="xl">{user.firstName?.charAt(0) || 'U'}</Avatar>
+                      <Text fw={500} size="sm" lh={1} mr={3}>{user.firstName || 'User'}</Text>
                       <IconChevronDown size={12} stroke={1.5} />
                     </Group>
                   </UnstyledButton>
@@ -64,6 +60,9 @@ export default function Navbar() {
                   <Menu.Item leftSection={<IconHeart size={14} />} onClick={() => router.push('/favorites')}>
                     My Favorites
                   </Menu.Item>
+                  <Menu.Item leftSection={<IconMap2 size={14} />} onClick={() => router.push('/my-plans')}>
+                    My Plans
+                  </Menu.Item>
                   <Menu.Item leftSection={<IconSettings size={14} />}>
                     Settings
                   </Menu.Item>
@@ -71,7 +70,7 @@ export default function Navbar() {
                   <Menu.Item 
                     color="red" 
                     leftSection={<IconLogout size={14} />}
-                    onClick={() => setIsLoggedIn(false)}
+                    onClick={logout}
                   >
                     Logout
                   </Menu.Item>

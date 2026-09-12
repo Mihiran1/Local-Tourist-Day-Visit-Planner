@@ -8,6 +8,10 @@ import { useState } from 'react';
 import api from '../../services/api';
 import Navbar from '../../components/Navbar';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { IconMap2 } from '@tabler/icons-react';
+
+const MapComponent = dynamic(() => import('../../components/Map'), { ssr: false });
 
 export default function PlanPage() {
   const { planItems, removeFromPlan, moveItemUp, moveItemDown, clearPlan } = useTripPlan();
@@ -15,15 +19,38 @@ export default function PlanPage() {
   const router = useRouter();
   const [planName, setPlanName] = useState('My Awesome Day Trip');
   const [tripDate, setTripDate] = useState('');
+  const [startTime, setStartTime] = useState('09:00');
 
-  // Generate Timeline Times (Assuming 1.5 hours per place, starting at 09:00 AM)
+  // Parse start time "HH:MM" into hours and minutes
+  const getStartMinutes = () => {
+    const [h, m] = startTime.split(':').map(Number);
+    return (h || 9) * 60 + (m || 0);
+  };
+
+  // Generate Timeline Times (Assuming 1.5 hours per place)
   const generateTime = (index: number) => {
-    const startHour = 9; 
-    const totalMinutes = startHour * 60 + index * 90; // 90 mins per place
-    const h = Math.floor(totalMinutes / 60);
+    const totalMinutes = getStartMinutes() + index * 90; // 90 mins per place
+    const h = Math.floor(totalMinutes / 60) % 24;
     const m = totalMinutes % 60;
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
   };
+
+  const getTotalDuration = () => {
+    if (planItems.length === 0) return "0h 0m";
+    const totalMins = planItems.length * 90;
+    return `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
+  };
+
+  const mapMarkers = planItems.map((item, index) => ({
+    id: item.id,
+    name: `${index + 1}. ${item.name}`,
+    lat: item.lat || 0,
+    lng: item.lng || 0,
+    image: item.imageUrl,
+    category: item.category
+  })).filter(m => m.lat !== 0 && m.lng !== 0);
+
+  const routePositions = mapMarkers.map(m => [m.lat, m.lng] as [number, number]);
 
   const handleSavePlan = async () => {
     if (!user) {
@@ -50,7 +77,7 @@ export default function PlanPage() {
         }))
       };
 
-      await api.post('/api/plans', payload);
+      await api.post('/plans', payload);
       alert("Visit plan saved successfully!");
       clearPlan();
       router.push('/');
@@ -65,7 +92,22 @@ export default function PlanPage() {
       <Navbar />
       
       <Container size="lg" mt={40}>
-        <Title order={1} fw={900} mb="xl">Build Your Perfect Day Trip</Title>
+        <Group justify="space-between" align="center" mb="xl">
+          <Title order={1} fw={900}>Build Your Perfect Day Trip</Title>
+          {planItems.length > 0 && (
+            <Button 
+              variant="light" 
+              color="red" 
+              onClick={() => {
+                if (confirm('Are you sure you want to clear your current plan and start a new one?')) {
+                  clearPlan();
+                }
+              }}
+            >
+              Start New Plan
+            </Button>
+          )}
+        </Group>
         
         <Flex gap="xl" direction={{ base: 'column', md: 'row' }}>
           {/* Left Side: Selected Attractions */}
@@ -83,8 +125,27 @@ export default function PlanPage() {
                   value={tripDate} 
                   onChange={(e) => setTripDate(e.currentTarget.value)} 
                 />
+                <TextInput 
+                  type="time"
+                  label="Start Time" 
+                  value={startTime} 
+                  onChange={(e) => setStartTime(e.currentTarget.value)} 
+                />
               </Group>
             </Paper>
+
+            {/* Map Preview */}
+            {mapMarkers.length > 0 && (
+              <Card p={0} radius="md" withBorder mb="lg" style={{ height: '350px', overflow: 'hidden' }}>
+                <MapComponent 
+                  interactive={true} 
+                  markers={mapMarkers} 
+                  routePositions={routePositions}
+                  center={routePositions[0] || [7.6715, 81.0409]}
+                  zoom={12}
+                />
+              </Card>
+            )}
 
             {planItems.length === 0 ? (
               <Text c="dimmed">Your plan is empty. Go explore and add some places!</Text>
@@ -120,7 +181,12 @@ export default function PlanPage() {
           {/* Right Side: Timeline & Save Button */}
           <div style={{ flex: 1 }}>
             <Paper p="xl" radius="md" withBorder bg="darkGreen.9" c="white" style={{ position: 'sticky', top: '20px' }}>
-              <Title order={3} mb="xl">Your Timeline</Title>
+              <Group justify="space-between" mb="xl">
+                <Title order={3}>Your Timeline</Title>
+                {planItems.length > 0 && (
+                  <Badge color="teal.5" variant="light" size="lg">Total: {getTotalDuration()}</Badge>
+                )}
+              </Group>
               
               <Timeline active={planItems.length} bulletSize={14} lineWidth={2} color="teal.4">
                 {planItems.map((item, index) => (

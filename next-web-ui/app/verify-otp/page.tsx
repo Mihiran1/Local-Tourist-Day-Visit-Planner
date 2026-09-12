@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
-import { Title, Text, Button, Box, Flex, PinInput, Center } from '@mantine/core';
+import { Title, Text, Button, Box, Flex, PinInput, Center, Anchor } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import api from '../../services/api'; // services folder was copied to root
@@ -78,6 +78,27 @@ export default function VerifyOtp() {
               Verify Account
             </Button>
           </form>
+
+          <Text c="dimmed" fz={{ base: 'sm', lg: 'md' }} ta="center" mt="xl">
+            Didn't receive the code?{' '}
+            <Anchor 
+              component="button" 
+              fz={{ base: 'sm', lg: 'md' }} 
+              color="dimmed" 
+              className="underline-link" 
+              onClick={async (e) => {
+                e.preventDefault();
+                try {
+                  await api.post('/auth/forgot-password', { email });
+                  alert('A new OTP has been sent to your email!');
+                } catch (error) {
+                  alert('Failed to resend OTP. Please try again later.');
+                }
+              }}
+            >
+              Resend OTP
+            </Anchor>
+          </Text>
         </Box>
       </Box>
     </Flex>

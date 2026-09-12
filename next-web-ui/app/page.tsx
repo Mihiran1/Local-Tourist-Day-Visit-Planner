@@ -21,6 +21,8 @@ interface Attraction {
   category: string;
   description: string;
   distance: string;
+  latitude: number;
+  longitude: number;
   imageUrls: string[]; 
 }
 
@@ -332,7 +334,9 @@ export default function HomePage() {
                             id: attraction.id,
                             name: attraction.name,
                             category: attraction.category,
-                            imageUrl: firstImage
+                            imageUrl: firstImage,
+                            lat: attraction.latitude,
+                            lng: attraction.longitude
                           });
                         }}
                       >

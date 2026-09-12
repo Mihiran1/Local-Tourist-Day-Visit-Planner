@@ -56,12 +56,12 @@ function MapController({
 }) {
   const map = useMap();
   useEffect(() => {
-    if (selectedMarker) {
+    if (selectedMarker?.lat && selectedMarker?.lng) {
       map.flyTo([selectedMarker.lat, selectedMarker.lng], 14, { duration: 1.5 });
-    } else {
-      map.flyTo(center, zoom, { duration: 1.5 });
+    } else if (center && center.length === 2) {
+      map.flyTo([center[0], center[1]], zoom, { duration: 1.5 });
     }
-  }, [center, zoom, selectedMarker, map]);
+  }, [center?.[0], center?.[1], zoom, selectedMarker?.lat, selectedMarker?.lng, map]);
   return null;
 }
 

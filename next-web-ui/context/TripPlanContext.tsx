@@ -7,6 +7,8 @@ export interface PlanItem {
   name: string;
   category: string;
   imageUrl: string;
+  lat?: number;
+  lng?: number;
 }
 
 interface TripPlanContextType {
