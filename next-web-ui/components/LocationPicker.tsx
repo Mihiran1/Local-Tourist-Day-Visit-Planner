@@ -3,7 +3,7 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // Leaflet වල සාමාන්‍ය Marker (Pin එක) Next.js එක්ක දාද්දි සමහර වෙලාවට පෙන්නන්නේ නෑ.
 // ඒකට විසඳුමක් විදියට අපි ඒ පින්තූර අන්තර්ජාලයෙන් (CDN එකකින්) කෙලින්ම ගන්නවා.
@@ -35,7 +35,16 @@ function LocationMarker({ position, onChange }: { position: [number, number] | n
   // අපි අලුතින් තැනක් දුන්නොත්, Map එක ඔටෝම ඒ තැනට යනවා.
   useEffect(() => {
     if (position) {
-      map.flyTo(position, map.getZoom());
+      const timeoutId = setTimeout(() => {
+        try {
+          map.flyTo(position, map.getZoom());
+        } catch (e) {
+          try {
+            map.setView(position, map.getZoom());
+          } catch (e2) {}
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
     }
   }, [position, map]);
 
@@ -47,12 +56,21 @@ function LocationMarker({ position, onChange }: { position: [number, number] | n
 
 // මේක තමයි ප්‍රධාන Map Component එක. මේක තමයි අපි Form එකට දාන්නේ.
 export default function LocationPicker({ latitude, longitude, onChange }: LocationPickerProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // දෙහිඅත්තකණ්ඩිය ප්‍රදේශයේ ඛණ්ඩාංක (Default Center)
   const defaultCenter: [number, number] = [7.6667, 81.0333];
   
   const position: [number, number] | null = 
     (latitude && longitude) ? [latitude, longitude] : null;
+
+  if (!mounted) {
+    return <div style={{ height: '400px', width: '100%', borderRadius: '8px', backgroundColor: '#eaeaea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Map...</div>;
+  }
 
   return (
     // MapContainer එකෙන් තමයි සම්පූර්ණ Map එක හැදෙන්නේ

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { 
   Container, Paper, Title, Text, Button, Group, TextInput, Select, 
   Textarea, Grid, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor,
-  FileButton, Card, SimpleGrid, Image, ActionIcon
+  FileButton, Card, SimpleGrid, Image, ActionIcon, Checkbox
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
@@ -45,6 +45,7 @@ export default function AddAttractionPage() {
       openAmPm: 'AM',
       closeTime: '',
       closeAmPm: 'PM',
+      is24Hours: false,
       travelTips: '',
       latitude: '',
       longitude: '',
@@ -85,7 +86,9 @@ export default function AddAttractionPage() {
       data.append('distance', values.distance);
       
       let finalOpeningTime = '';
-      if (values.openTime && values.closeTime) {
+      if (values.is24Hours) {
+        finalOpeningTime = '24 Hours Open';
+      } else if (values.openTime && values.closeTime) {
         finalOpeningTime = `${values.openTime} ${values.openAmPm} - ${values.closeTime} ${values.closeAmPm}`;
       } else if (values.openTime) {
         finalOpeningTime = `${values.openTime} ${values.openAmPm}`;
@@ -143,16 +146,6 @@ export default function AddAttractionPage() {
               <Breadcrumbs separator=">" mb="xs">{breadcrumbs}</Breadcrumbs>
               <Title order={2} fw={800} c="dark.8">Add New Attraction</Title>
             </div>
-            <Button 
-              size="md"
-              color="darkGreen.8" 
-              type="submit" 
-              radius="md"
-              leftSection={<IconDeviceFloppy size={18} />}
-              loading={loading}
-            >
-              Save Attraction
-            </Button>
           </Group>
 
           {/* Form Sections Stack */}
@@ -193,7 +186,9 @@ export default function AddAttractionPage() {
                   <Textarea 
                     label="Detailed Description" 
                     placeholder="Comprehensive description of the attraction..." 
-                    minRows={4} 
+                    minRows={6}
+                    autosize
+                    maxRows={15}
                     withAsterisk
                     size="md"
                     {...form.getInputProps('description')}
@@ -264,8 +259,17 @@ export default function AddAttractionPage() {
               </Group>
 
               <Grid>
+                <Grid.Col span={12} mb="xs">
+                  <Checkbox
+                    label="Open 24 Hours"
+                    color="darkGreen.9"
+                    size="md"
+                    fw={500}
+                    {...form.getInputProps('is24Hours', { type: 'checkbox' })}
+                  />
+                </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 6 }}>
-                  <Text fw={500} size="sm" mb="xs">Opening Time</Text>
+                  <Text fw={500} size="sm" mb="xs" c={form.values.is24Hours ? "dimmed" : "dark"}>Opening Time</Text>
                   <Flex gap="xs">
                     <Select 
                       placeholder="Select Time" 
@@ -274,18 +278,20 @@ export default function AddAttractionPage() {
                       size="md"
                       style={{ flex: 1 }}
                       leftSection={<IconClock size={18} style={{ opacity: 0.5 }} />}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('openTime')}
                     />
                     <Select 
                       data={['AM', 'PM']}
                       size="md"
                       w={90}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('openAmPm')}
                     />
                   </Flex>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 6 }}>
-                  <Text fw={500} size="sm" mb="xs">Closing Time</Text>
+                  <Text fw={500} size="sm" mb="xs" c={form.values.is24Hours ? "dimmed" : "dark"}>Closing Time</Text>
                   <Flex gap="xs">
                     <Select 
                       placeholder="Select Time" 
@@ -294,12 +300,14 @@ export default function AddAttractionPage() {
                       size="md"
                       style={{ flex: 1 }}
                       leftSection={<IconClock size={18} style={{ opacity: 0.5 }} />}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('closeTime')}
                     />
                     <Select 
                       data={['AM', 'PM']}
                       size="md"
                       w={90}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('closeAmPm')}
                     />
                   </Flex>
@@ -308,7 +316,9 @@ export default function AddAttractionPage() {
                   <Textarea 
                     label="Travel Tips & Safety" 
                     placeholder="E.g., Best time to visit is early morning. Wear comfortable shoes..." 
-                    minRows={3}
+                    minRows={5}
+                    autosize
+                    maxRows={10}
                     size="md"
                     {...form.getInputProps('travelTips')}
                   />
@@ -387,6 +397,33 @@ export default function AddAttractionPage() {
                 </Box>
               )}
             </Paper>
+
+            {/* Form Actions */}
+            <Group justify="flex-end" mt="xl">
+              <Button 
+                variant="default"
+                size="md"
+                w={180}
+                radius="md"
+                onClick={() => {
+                  form.reset();
+                  setImagePreviews([]);
+                }}
+              >
+                Reset Attraction
+              </Button>
+              <Button 
+                size="md"
+                w={180}
+                color="darkGreen.8" 
+                type="submit" 
+                radius="md"
+                leftSection={<IconDeviceFloppy size={18} />}
+                loading={loading}
+              >
+                Save Attraction
+              </Button>
+            </Group>
 
           </Stack>
         </form>
