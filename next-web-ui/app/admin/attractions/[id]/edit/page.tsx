@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { 
   Container, Paper, Title, Text, Button, Group, TextInput, Select, 
-  Textarea, Grid, FileInput, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor, Loader, Center
+  Textarea, Grid, FileInput, Box, Flex, Stack, ThemeIcon, Breadcrumbs, Anchor, Loader, Center, Checkbox,
+  FileButton, Card, SimpleGrid, Image, ActionIcon
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter, useParams } from 'next/navigation';
@@ -11,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { 
   IconInfoCircle, IconMapPin, IconCamera, IconDeviceFloppy, 
   IconBuildingMonument, IconCategory, IconCompass, IconClock, 
-  IconBulb, IconUpload 
+  IconBulb, IconUpload, IconPhoto, IconX 
 } from '@tabler/icons-react';
 import api from '../../../../../services/api';
 
@@ -35,6 +36,7 @@ export default function EditAttractionPage() {
   
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const form = useForm({
     initialValues: {
@@ -46,6 +48,7 @@ export default function EditAttractionPage() {
       openAmPm: 'AM',
       closeTime: '',
       closeAmPm: 'PM',
+      is24Hours: false,
       travelTips: '',
       latitude: '',
       longitude: '',
@@ -60,6 +63,21 @@ export default function EditAttractionPage() {
       // Images are not required for edit, they might just edit text
     },
   });
+
+  const handleImagesChange = (files: File[]) => {
+    const newFiles = [...form.values.images, ...files];
+    form.setFieldValue('images', newFiles);
+    
+    const previews = files.map(file => URL.createObjectURL(file));
+    setImagePreviews(prev => [...prev, ...previews]);
+  };
+
+  const removeImage = (index: number) => {
+    const newFiles = form.values.images.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    form.setFieldValue('images', newFiles);
+    setImagePreviews(newPreviews);
+  };
 
   // Page එක Load වෙද්දී පරණ Data ගේන කෑල්ල
   useEffect(() => {
@@ -76,8 +94,11 @@ export default function EditAttractionPage() {
         let openAmPm = 'AM';
         let closeTime = '';
         let closeAmPm = 'PM';
+        let is24Hours = false;
         
-        if (timeStr.includes('-')) {
+        if (timeStr === '24 Hours Open') {
+          is24Hours = true;
+        } else if (timeStr.includes('-')) {
           const parts = timeStr.split('-');
           const start = parts[0].trim().split(' ');
           const end = parts[1].trim().split(' ');
@@ -101,6 +122,7 @@ export default function EditAttractionPage() {
           openAmPm,
           closeTime,
           closeAmPm,
+          is24Hours,
           images: [],
         });
         
@@ -125,7 +147,9 @@ export default function EditAttractionPage() {
       data.append('distance', values.distance);
       
       let finalOpeningTime = '';
-      if (values.openTime && values.closeTime) {
+      if (values.is24Hours) {
+        finalOpeningTime = '24 Hours Open';
+      } else if (values.openTime && values.closeTime) {
         finalOpeningTime = `${values.openTime} ${values.openAmPm} - ${values.closeTime} ${values.closeAmPm}`;
       } else if (values.openTime) {
         finalOpeningTime = `${values.openTime} ${values.openAmPm}`;
@@ -183,16 +207,6 @@ export default function EditAttractionPage() {
               <Breadcrumbs separator=">" mb="xs">{breadcrumbs}</Breadcrumbs>
               <Title order={2} fw={800} c="dark.8">Edit Attraction</Title>
             </div>
-            <Button 
-              size="md"
-              color="darkGreen.8" 
-              type="submit" 
-              radius="md"
-              leftSection={<IconDeviceFloppy size={18} />}
-              loading={loading}
-            >
-              Update Attraction
-            </Button>
           </Group>
 
           <Stack gap="lg">
@@ -231,7 +245,9 @@ export default function EditAttractionPage() {
                   <Textarea 
                     label="Detailed Description" 
                     placeholder="Comprehensive description of the attraction..." 
-                    minRows={4} 
+                    minRows={6}
+                    autosize
+                    maxRows={15}
                     withAsterisk
                     size="md"
                     {...form.getInputProps('description')}
@@ -300,8 +316,17 @@ export default function EditAttractionPage() {
               </Group>
 
               <Grid>
+                <Grid.Col span={12} mb="xs">
+                  <Checkbox
+                    label="Open 24 Hours"
+                    color="darkGreen.9"
+                    size="md"
+                    fw={500}
+                    {...form.getInputProps('is24Hours', { type: 'checkbox' })}
+                  />
+                </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 6 }}>
-                  <Text fw={500} size="sm" mb="xs">Opening Time</Text>
+                  <Text fw={500} size="sm" mb="xs" c={form.values.is24Hours ? "dimmed" : "dark"}>Opening Time</Text>
                   <Flex gap="xs">
                     <Select 
                       placeholder="Select Time" 
@@ -310,18 +335,20 @@ export default function EditAttractionPage() {
                       size="md"
                       style={{ flex: 1 }}
                       leftSection={<IconClock size={18} style={{ opacity: 0.5 }} />}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('openTime')}
                     />
                     <Select 
                       data={['AM', 'PM']}
                       size="md"
                       w={90}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('openAmPm')}
                     />
                   </Flex>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 6 }}>
-                  <Text fw={500} size="sm" mb="xs">Closing Time</Text>
+                  <Text fw={500} size="sm" mb="xs" c={form.values.is24Hours ? "dimmed" : "dark"}>Closing Time</Text>
                   <Flex gap="xs">
                     <Select 
                       placeholder="Select Time" 
@@ -330,12 +357,14 @@ export default function EditAttractionPage() {
                       size="md"
                       style={{ flex: 1 }}
                       leftSection={<IconClock size={18} style={{ opacity: 0.5 }} />}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('closeTime')}
                     />
                     <Select 
                       data={['AM', 'PM']}
                       size="md"
                       w={90}
+                      disabled={form.values.is24Hours}
                       {...form.getInputProps('closeAmPm')}
                     />
                   </Flex>
@@ -344,7 +373,9 @@ export default function EditAttractionPage() {
                   <Textarea 
                     label="Travel Tips & Safety" 
                     placeholder="E.g., Best time to visit is early morning. Wear comfortable shoes..." 
-                    minRows={3}
+                    minRows={5}
+                    autosize
+                    maxRows={10}
                     size="md"
                     {...form.getInputProps('travelTips')}
                   />
@@ -363,17 +394,96 @@ export default function EditAttractionPage() {
                 <Title order={4}>Media Gallery</Title>
               </Group>
 
-              <FileInput 
-                label="Update Images (Optional)" 
-                description="Upload new images only if you want to replace the existing ones."
-                placeholder="Click to browse or drag images here" 
-                multiple 
-                accept="image/*"
-                size="md"
-                leftSection={<IconUpload size={18} style={{ opacity: 0.5 }} />}
-                {...form.getInputProps('images')}
-              />
+              <Text size="sm" mb="md" c="dimmed">
+                Upload new images only if you want to replace the existing ones. High-quality images attract more visitors.
+              </Text>
+              
+              <FileButton onChange={handleImagesChange} accept="image/*" multiple>
+                {(props) => (
+                  <Card 
+                    {...props} 
+                    withBorder 
+                    style={{ 
+                      borderStyle: 'dashed', 
+                      borderWidth: 2,
+                      borderColor: form.errors.images ? '#fa5252' : '#ced4da',
+                      cursor: 'pointer', 
+                      textAlign: 'center', 
+                      backgroundColor: '#f8f9fa',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    p="xl"
+                  >
+                    <Group justify="center">
+                      <IconPhoto size={40} style={{ color: '#adb5bd' }} />
+                    </Group>
+                    <Text mt="md" fw={600} size="lg">Click to browse or upload new images</Text>
+                    <Text size="sm" c="dimmed">You can select multiple images.</Text>
+                  </Card>
+                )}
+              </FileButton>
+              
+              {form.errors.images && (
+                <Text c="red" size="sm" mt="xs">{form.errors.images}</Text>
+              )}
+
+              {imagePreviews.length > 0 && (
+                <Box mt="lg">
+                  <Text fw={500} size="sm" mb="xs">Selected New Images ({imagePreviews.length})</Text>
+                  <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 5 }}>
+                    {imagePreviews.map((preview, index) => (
+                      <div key={index} style={{ position: 'relative' }}>
+                        <Image 
+                          src={preview} 
+                          radius="md" 
+                          h={120} 
+                          w="100%" 
+                          fit="cover" 
+                          style={{ border: '1px solid #dee2e6' }}
+                        />
+                        <ActionIcon 
+                          color="red" 
+                          variant="filled" 
+                          size="sm" 
+                          radius="xl"
+                          style={{ position: 'absolute', top: 5, right: 5, zIndex: 10 }}
+                          onClick={() => removeImage(index)}
+                        >
+                          <IconX size={14} />
+                        </ActionIcon>
+                      </div>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+              )}
             </Paper>
+
+            {/* Form Actions */}
+            <Group justify="flex-end" mt="xl">
+              <Button 
+                variant="default"
+                size="md"
+                w={180}
+                radius="md"
+                onClick={() => {
+                  form.reset();
+                  setImagePreviews([]);
+                }}
+              >
+                Reset Changes
+              </Button>
+              <Button 
+                size="md"
+                w={180}
+                color="darkGreen.8" 
+                type="submit" 
+                radius="md"
+                leftSection={<IconDeviceFloppy size={18} />}
+                loading={loading}
+              >
+                Update Attraction
+              </Button>
+            </Group>
 
           </Stack>
         </form>
