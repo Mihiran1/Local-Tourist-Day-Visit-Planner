@@ -82,12 +82,12 @@ export default function HomePage() {
 
   const categoryData = [
     { name: 'Nature & Wildlife', count: 24, icon: <IconTree size={16} />, image: '/ca1.png' },
-    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: '/2.png' },
-    { name: 'Heritage Sites', count: 12, icon: <IconBuildingMonument size={16} />, image: '/3.png' },
-    { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: '/4.png' },
-    { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: '/5.png' },
-    { name: 'Industrial/Education', count: 5, icon: <IconBuildingFactory size={16} />, image: '/dak1.jpeg' },
-    { name: 'Restaurant', count: 8, icon: <IconToolsKitchen2 size={16} />, image: '/dak2.jpeg' },
+    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: '/ca22.jpg' },
+    { name: 'Heritage Sites', count: 12, icon: <IconBuildingMonument size={16} />, image: '/ca3.jpeg' },
+    { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: '/ca4.jpeg' },
+    { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: '/ca55.png' },
+    { name: 'Industrial/Education', count: 5, icon: <IconBuildingFactory size={16} />, image: '/ca6.jpeg' },
+    { name: 'Restaurant', count: 8, icon: <IconToolsKitchen2 size={16} />, image: '/ca7.jpeg' },
   ];
 
   const realCategoryData = categoryData.map(cat => {
