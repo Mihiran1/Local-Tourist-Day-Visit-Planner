@@ -15,6 +15,7 @@ import styles from './page.module.css';
 
 const MapComponent = dynamic(() => import('../components/Map'), { ssr: false });
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 interface Attraction {
   id: number;
@@ -438,7 +439,7 @@ export default function HomePage() {
       </Container>
       
       {/* Plan Your Perfect Day Trip Banner */}
-      <Container fluid px={{ base: 'md', lg: 150 }} mt={80}>
+      <Container fluid px={{ base: 'md', lg: 150 }} mt={80} mb={80}>
         <Paper p={{ base: 'xl', md: 50 }} radius="xl" bg="darkGreen.9" c="white" className={styles.planBanner}>
           {/* Subtle background gradient overlay for the banner */}
           <div className={styles.planBannerGradient} />
@@ -533,8 +534,8 @@ export default function HomePage() {
         </Paper>
       </Container>
 
-
-     
+  
+      <Footer />
     </div>
   );
 }

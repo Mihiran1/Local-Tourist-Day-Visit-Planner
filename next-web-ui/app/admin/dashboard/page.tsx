@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   Title,
+  Card,
   Button,
   Group,
   Text,
@@ -11,10 +12,16 @@ import {
   Paper,
   Stack,
   SimpleGrid,
-  Card,
   ThemeIcon,
   Box,
+  Grid,
+  Table,
+  Avatar,
+  ScrollArea,
+  ColorSwatch
 } from '@mantine/core';
+import { DonutChart } from '@mantine/charts';
+import '@mantine/charts/styles.css';
 import { useRouter } from 'next/navigation';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -57,6 +64,7 @@ function getGreeting() {
   return 'Good evening';
 }
 
+// Mock Data for Charts (Will be updated with real data)
 export default function AdminDashboard() {
   const router = useRouter();
   const { user } = useAuth();
@@ -67,6 +75,9 @@ export default function AdminDashboard() {
     totalUsers: 0,
     totalVisitPlans: 0,
   });
+
+  const [categoryData, setCategoryData] = useState<{name: string, value: number, color: string}[]>([]);
+  const [recentAttractions, setRecentAttractions] = useState<any[]>([]);
 
   // Page එක Load වෙද්දී API එකට කතා කිරීම
   useEffect(() => {
@@ -81,6 +92,30 @@ export default function AdminDashboard() {
         // අර අපි Backend එකේ හදපු අලුත් API එකට කතා කරනවා
         const response = await api.get('/admin/dashboard/stats');
         setStats(response.data); // ආපු දත්ත ටික State එකට දාගන්නවා
+
+        // සියලුම Attractions අරගෙන Charts වලට ඕන දත්ත හදනවා
+        const attrRes = await api.get('/attractions');
+        const attractions = attrRes.data;
+
+        // Category අනුව කීයක් තියෙනවද කියලා ගණන් කරනවා
+        const categoryCount: Record<string, number> = {};
+        attractions.forEach((a: any) => {
+          const cat = a.category || 'Other';
+          categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+        });
+
+        const colors = ['teal.6', 'blue.6', 'orange.6', 'grape.6', 'red.6', 'cyan.6', 'lime.6'];
+        const catChartData = Object.keys(categoryCount).map((cat, index) => ({
+          name: cat,
+          value: categoryCount[cat],
+          color: colors[index % colors.length]
+        }));
+        setCategoryData(catChartData.length > 0 ? catChartData : [{ name: 'No Data', value: 1, color: 'gray.4' }]);
+
+        // Recently Added Attractions (Last 5 based on array order assuming newest are highest ID)
+        const sorted = [...attractions].sort((a, b) => b.id - a.id);
+        setRecentAttractions(sorted.slice(0, 5));
+
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
       }
@@ -206,6 +241,95 @@ export default function AdminDashboard() {
           );
         })}
       </SimpleGrid>
+
+      {/* 3. Charts Section */}
+      <Grid mt="xl">
+        {/* Recently Added List */}
+        <Grid.Col span={{ base: 12, md: 8 }}>
+          <Paper withBorder p="xl" radius="md" bg="white" h="100%">
+            <Group justify="space-between" mb="lg">
+              <Title order={4} c="dark.8">Recently Added Attractions</Title>
+              <Button variant="subtle" color="darkGreen.9" size="sm" onClick={() => router.push('/admin/attractions')}>View All</Button>
+            </Group>
+            
+            <ScrollArea h={290}>
+              <Table verticalSpacing="sm">
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Attraction</Table.Th>
+                    <Table.Th>Category</Table.Th>
+                    <Table.Th>Location</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {recentAttractions.map((item) => (
+                    <Table.Tr key={item.id}>
+                      <Table.Td>
+                        <Group gap="sm">
+                          <Avatar 
+                            src={item.imageUrls && item.imageUrls.length > 0 ? `http://localhost:8080${item.imageUrls[0]}` : null} 
+                            radius="md" 
+                            size={40} 
+                          />
+                          <div>
+                            <Text fz="sm" fw={500}>{item.name}</Text>
+                          </div>
+                        </Group>
+                      </Table.Td>
+                      <Table.Td>
+                        <Badge color="gray" variant="light">{item.category}</Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm" c="dimmed">{item.distance}</Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                  {recentAttractions.length === 0 && (
+                    <Table.Tr>
+                      <Table.Td colSpan={3} ta="center">
+                        <Text c="dimmed" size="sm" py="md">No attractions found.</Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+                </Table.Tbody>
+              </Table>
+            </ScrollArea>
+          </Paper>
+        </Grid.Col>
+
+        {/* Donut Chart - Categories */}
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Paper withBorder p="xl" radius="md" bg="white" h="100%">
+            <Title order={4} c="dark.8" mb="sm">Attractions by Category</Title>
+            <Text size="sm" c="dimmed" mb="xl">Breakdown of destinations</Text>
+            
+            <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 220, position: 'relative' }}>
+              <DonutChart 
+                data={categoryData} 
+                size={200}
+                thickness={26}
+                paddingAngle={6}
+                withLabels={false}
+                withTooltip
+                chartLabel={stats.totalAttractions.toString()}
+                strokeWidth={0}
+              />
+            </Box>
+            
+            <Stack gap="sm" mt="xl">
+              {categoryData.map((item, index) => (
+                <Group key={index} justify="space-between" wrap="nowrap">
+                  <Group gap="sm">
+                    <ColorSwatch color={`var(--mantine-color-${item.color.replace('.', '-')})`} size={14} />
+                    <Text size="sm" fw={500} c="dark.7">{item.name}</Text>
+                  </Group>
+                  <Text size="sm" fw={700} c="dark.9">{item.value}</Text>
+                </Group>
+              ))}
+            </Stack>
+          </Paper>
+        </Grid.Col>
+      </Grid>
 
     </Container>
   );

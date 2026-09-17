@@ -3,6 +3,7 @@
 import { Container, Title, Text, Box, Grid, Image, ThemeIcon, List, Flex, Button } from '@mantine/core';
 import { IconMapPin, IconCalendarEvent, IconRoute, IconInfoCircle, IconArrowRight } from '@tabler/icons-react';
 import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
 import Link from 'next/link';
 
 export default function AboutPage() {
@@ -143,6 +144,7 @@ export default function AboutPage() {
         </Container>
       </Box>
 
+      <Footer />
     </div>
   );
 }

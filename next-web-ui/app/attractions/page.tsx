@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import api from '../../services/api';
 import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
 
 interface Attraction {
   id: number;
@@ -186,6 +187,7 @@ function AttractionsContent() {
           </Box>
         )}
       </Container>
+      <Footer />
     </div>
   );
 }
