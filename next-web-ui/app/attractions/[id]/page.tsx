@@ -54,6 +54,28 @@ export default function AttractionDetailsPage() {
     return <Box p="xl" ta="center"><Text>Attraction not found.</Text></Box>;
   }
 
+  const formatWithBoldSubtopics = (text: string) => {
+    if (!text) return '';
+    // Bold any text before a colon at the beginning of a line or bullet point
+    return text.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+)?)([^:*_\n]{2,60}):/gm, '$1**$2**:');
+  };
+
+  const formatTravelTips = (text: string) => {
+    if (!text) return '';
+    const bulleted = text
+      .split('\n')
+      .filter(line => line.trim() !== '')
+      .map(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('-') || trimmed.startsWith('*') || /^\d+\./.test(trimmed)) {
+          return trimmed;
+        }
+        return `- ${trimmed}`;
+      })
+      .join('\n');
+    return formatWithBoldSubtopics(bulleted);
+  };
+
   const heroImage = attraction.imageUrls && attraction.imageUrls.length > 0 
     ? `http://localhost:8080${encodeURI(attraction.imageUrls[0])}` 
     : 'https://placehold.co/1200x500?text=No+Image';
@@ -126,7 +148,7 @@ export default function AttractionDetailsPage() {
             <Paper p="xl" radius="md" shadow="sm" withBorder bg="white">
               <Title order={3} mb="md">About this place</Title>
               <div className="markdown-content">
-                <ReactMarkdown>{attraction.description}</ReactMarkdown>
+                <ReactMarkdown>{formatWithBoldSubtopics(attraction.description)}</ReactMarkdown>
               </div>
             </Paper>
 
@@ -178,7 +200,9 @@ export default function AttractionDetailsPage() {
                     <Title order={4}>Travel Tips & Safety</Title>
                   </Group>
                   <div className="markdown-content-sm">
-                    <ReactMarkdown>{attraction.travelTips}</ReactMarkdown>
+                    <ReactMarkdown>
+                      {formatTravelTips(attraction.travelTips)}
+                    </ReactMarkdown>
                   </div>
                 </Paper>
               )}

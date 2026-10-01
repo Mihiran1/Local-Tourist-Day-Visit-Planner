@@ -6,6 +6,8 @@ import { createContext, useState, useContext, useEffect, type ReactNode } from '
 interface User {
   email: string;
   role: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 // Context එකේ තියෙන දේවල් මොනවාද කියලා Type කරනවා
