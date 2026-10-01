@@ -118,10 +118,10 @@ export default function HomePage() {
         ))}
 
         <Container size="md" className={styles.heroContent}>
-          <Title order={1} size="4rem" fw={900} mb="md">
+          <Title order={1} fz={{ base: '2.5rem', sm: '3rem', md: '4rem' }} lh={1.2} fw={900} mb="md">
             Explore the Hidden Beauty of Dehiattakandiya
           </Title>
-          <Text size="xl" mb="xl" c="gray.2">
+          <Text fz={{ base: 'md', sm: 'xl' }} mb="xl" c="gray.2">
             Discover breathtaking landscapes, sacred temples, and amazing wildlife in one of Sri Lanka&apos;s most beautiful destinations.
           </Text>
           <Group justify="center">
