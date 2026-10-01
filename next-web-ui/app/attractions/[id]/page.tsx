@@ -70,19 +70,36 @@ export default function AttractionDetailsPage() {
     // Bold entire short list items with no trailing punctuation
     formatted = formatted.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+))([^:*_\.\n]{2,60})$/gm, '$1**$2**');
 
-    // Fix manual or auto-added markdown bold that has trailing/leading spaces (e.g. "** Text **" -> "**Text**")
+    // Convert manual or auto-added markdown bold that has trailing/leading spaces (e.g. "** Text **" -> "**Text**")
     formatted = formatted.replace(/\*\*\s*(.*?)\s*\*\*/g, '**$1**');
 
-    // Bold lines that look like emoji headers (e.g. "🌤️ Activities and Things to Do 📷")
+    // Convert emoji headers and standalone bold lines to Markdown H3 for better UX
     formatted = formatted
       .split('\n')
       .map(line => {
-        if (line.includes('**') || line.trim().startsWith('-') || line.trim().match(/^\d+\./) || line.length > 80) {
-          return line;
+        let trimmed = line.trim();
+        
+        // If it's already an H3, leave it
+        if (trimmed.startsWith('### ')) return line;
+
+        // If it's a standalone bold line, convert to H3
+        if (trimmed.match(/^\*\*(.*?)\*\*$/)) {
+          return trimmed.replace(/^\*\*(.*?)\*\*$/, '### $1');
         }
-        if (/[\uD800-\uDFFF\u2600-\u27BF]/.test(line) && !line.trim().endsWith('.')) {
-          return `**${line.trim()}**`;
+
+        // If it's a numbered bold line (e.g. "1. **Header**"), convert to H3
+        const listMatch = trimmed.match(/^(\d+\.\s+)\*\*(.*?)\*\*$/);
+        if (listMatch) {
+          return `### ${listMatch[1]}${listMatch[2]}`;
         }
+
+        // If it's an emoji line, convert to H3
+        if (!trimmed.includes('**') && !trimmed.startsWith('-') && !trimmed.match(/^\d+\./) && trimmed.length <= 80) {
+          if (/[\uD800-\uDFFF\u2600-\u27BF]/.test(trimmed) && !trimmed.endsWith('.')) {
+            return `### ${trimmed}`;
+          }
+        }
+        
         return line;
       })
       .join('  \n');
@@ -282,16 +299,19 @@ export default function AttractionDetailsPage() {
           }
           .markdown-content-sm {
             line-height: 1.6;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            color: #4a5568;
           }
           .markdown-content h1, .markdown-content h2, .markdown-content h3, 
           .markdown-content-sm h1, .markdown-content-sm h2, .markdown-content-sm h3 {
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-            color: #1a1a1a;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            color: #2c3e50;
+            font-size: 1.25rem;
+            font-weight: 700;
           }
           .markdown-content p, .markdown-content-sm p {
-            margin-bottom: 1em;
+            margin-bottom: 1.2em;
           }
           .markdown-content ul, .markdown-content-sm ul {
             padding-left: 1.5em;
