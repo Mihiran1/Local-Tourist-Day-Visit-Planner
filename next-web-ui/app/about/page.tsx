@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export default function AboutPage() {
   return (
-    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh' }}>
       <Navbar />
 
       {/* Header Section */}

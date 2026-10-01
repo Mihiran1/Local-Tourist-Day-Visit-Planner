@@ -50,7 +50,7 @@ function AttractionsContent() {
   });
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <Navbar />
 
       {/* Header Section */}
@@ -108,7 +108,7 @@ function AttractionsContent() {
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
           {filteredAttractions.map((attraction) => {
             const firstImage = attraction.imageUrls && attraction.imageUrls.length > 0 
-              ? `http://localhost:8080${attraction.imageUrls[0]}` 
+              ? `http://localhost:8080${encodeURI(attraction.imageUrls[0])}` 
               : 'https://placehold.co/400x250?text=No+Image';
 
             return (

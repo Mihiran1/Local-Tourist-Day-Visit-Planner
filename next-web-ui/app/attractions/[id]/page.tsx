@@ -55,7 +55,7 @@ export default function AttractionDetailsPage() {
   }
 
   const heroImage = attraction.imageUrls && attraction.imageUrls.length > 0 
-    ? `http://localhost:8080${attraction.imageUrls[0]}` 
+    ? `http://localhost:8080${encodeURI(attraction.imageUrls[0])}` 
     : 'https://placehold.co/1200x500?text=No+Image';
 
   return (
@@ -194,7 +194,7 @@ export default function AttractionDetailsPage() {
               {attraction.imageUrls.slice(1).map((img, idx) => (
                 <Image 
                   key={idx}
-                  src={`http://localhost:8080${img}`}
+                  src={`http://localhost:8080${encodeURI(img)}`}
                   height={250}
                   radius="xl"
                   fit="cover"
@@ -260,7 +260,7 @@ export default function AttractionDetailsPage() {
       >
         {openedImage && (
           <Image 
-            src={`http://localhost:8080${openedImage}`} 
+            src={`http://localhost:8080${encodeURI(openedImage)}`} 
             style={{ maxHeight: '90vh', maxWidth: '100vw', objectFit: 'contain' }} 
             onClick={() => setOpenedImage(null)}
           />
