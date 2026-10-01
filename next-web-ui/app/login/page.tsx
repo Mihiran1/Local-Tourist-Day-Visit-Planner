@@ -75,7 +75,7 @@ export default function Login() {
         <Box w="100%" maw={450}>
           <Title ta="center" fw={700} size="h1">Welcome back</Title>
           <Text c="dimmed" fz={{ base: 'sm', lg: 'md' }} ta="center" mt={5} mb={30}>
-            Login to your Acme Inc account
+            Login to your Local Tourist Day Visit Planner
           </Text>
 
           <form onSubmit={form.onSubmit(handleLogin)}>
@@ -100,7 +100,7 @@ export default function Login() {
               {...form.getInputProps('password')}
             />
 
-            <Button fullWidth mt="xl" size="md" type="submit" color="blue" radius="md">
+            <Button fullWidth mt="xl" size="md" type="submit" color="green.9" radius="md">
               Login
             </Button>
           </form>

@@ -44,7 +44,7 @@ export default function ForgotPassword() {
               mb="xl"
               {...form.getInputProps('email')}
             />
-            <Button fullWidth size="md" type="submit" color="blue" radius="md">
+            <Button fullWidth size="md" type="submit" color="green.9" radius="md">
               Send OTP
             </Button>
           </form>

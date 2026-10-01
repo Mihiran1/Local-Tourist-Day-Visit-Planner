@@ -113,7 +113,7 @@ export default function Signup() {
               {...form.getInputProps('password')}
             />
 
-            <Button fullWidth size="md" type="submit" color="blue" radius="md">
+            <Button fullWidth size="md" type="submit" color="green.9" radius="md">
               Sign Up
             </Button>
           </form>
