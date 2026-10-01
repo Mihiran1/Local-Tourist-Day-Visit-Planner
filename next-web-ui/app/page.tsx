@@ -534,6 +534,50 @@ export default function HomePage() {
         </Paper>
       </Container>
 
+      {/* Most Visited Places Section */}
+      <Container fluid px={{ base: 'md', lg: 150 }} mt={80} mb={60}>
+        <Group justify="space-between" align="flex-end" mb="xl">
+          <div>
+            <Title order={2} fw={800} c="darkGreen.9">Most Visited Places</Title>
+            <Text c="dimmed" mt={4}>Discover the top rated destinations</Text>
+          </div>
+          <Button 
+            component={Link} 
+            href="/attractions" 
+            variant="transparent" 
+            color="darkGreen.9" 
+            rightSection={<IconArrowRight size={16} />}
+            fw={600}
+          >
+            See All Places
+          </Button>
+        </Group>
+
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
+          {[
+            { name: 'Maduru Oya National Park', image: '/ca1.png', rating: 4.8 },
+            { name: 'Kudagala Temple', image: '/ca2.jpeg', rating: 4.5 },
+            { name: 'Henanigala Temple', image: '/ca3.jpeg', rating: 4.6 },
+            { name: 'Ancient Sluice', image: '/ca4.jpeg', rating: 4.7 }
+          ].map((place, idx) => (
+            <Card key={idx} radius="md" p={0} shadow="sm" withBorder>
+              <Card.Section>
+                <div style={{ backgroundImage: `url(${place.image})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '200px' }} />
+              </Card.Section>
+              <Group justify="space-between" mt="md" mb="xs" px="md">
+                <Text fw={600} size="md">{place.name}</Text>
+                <Badge color="yellow" variant="light">
+                  ★ {place.rating}
+                </Badge>
+              </Group>
+              <Text size="sm" c="dimmed" px="md" mb="md">
+                One of the most popular and highly rated places to visit.
+              </Text>
+            </Card>
+          ))}
+        </SimpleGrid>
+      </Container>
+
   
       <Footer />
     </div>
