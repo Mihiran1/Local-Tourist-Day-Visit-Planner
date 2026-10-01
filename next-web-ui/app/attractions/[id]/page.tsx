@@ -56,8 +56,38 @@ export default function AttractionDetailsPage() {
 
   const formatWithBoldSubtopics = (text: string) => {
     if (!text) return '';
-    // Bold any text before a colon at the beginning of a line or bullet point
-    return text.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+)?)([^:*_\n]{2,60}):/gm, '$1**$2**:');
+    let formatted = text;
+
+    // Bold any text before a colon (e.g. "Best time: Morning")
+    formatted = formatted.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+)?)([^:*_\n]{2,60}):/gm, '$1**$2**:');
+    
+    // Bold any text before a hyphen (e.g. "1. Photo - Take photos")
+    formatted = formatted.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+)?)([^:*_\-\n]{2,60})\s+-\s+/gm, '$1**$2** - ');
+
+    // Bold any text before a period in a list item (e.g. "1. Scenic Photography. The view is...")
+    formatted = formatted.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+))([^:*_\.\n]{2,60})\.(?=\s|$)/gm, '$1**$2**.');
+
+    // Bold entire short list items with no trailing punctuation
+    formatted = formatted.replace(/^(\s*(?:-\s+|\*\s+|\d+\.\s+))([^:*_\.\n]{2,60})$/gm, '$1**$2**');
+
+    // Fix manual or auto-added markdown bold that has trailing/leading spaces (e.g. "** Text **" -> "**Text**")
+    formatted = formatted.replace(/\*\*\s*(.*?)\s*\*\*/g, '**$1**');
+
+    // Bold lines that look like emoji headers (e.g. "🌤️ Activities and Things to Do 📷")
+    formatted = formatted
+      .split('\n')
+      .map(line => {
+        if (line.includes('**') || line.trim().startsWith('-') || line.trim().match(/^\d+\./) || line.length > 80) {
+          return line;
+        }
+        if (/[\uD800-\uDFFF\u2600-\u27BF]/.test(line) && !line.trim().endsWith('.')) {
+          return `**${line.trim()}**`;
+        }
+        return line;
+      })
+      .join('  \n');
+
+    return formatted;
   };
 
   const formatTravelTips = (text: string) => {
@@ -265,10 +295,10 @@ export default function AttractionDetailsPage() {
           }
           .markdown-content ul, .markdown-content-sm ul {
             padding-left: 1.5em;
-            margin-bottom: 1em;
+            margin-bottom: 1.5em;
           }
           .markdown-content li, .markdown-content-sm li {
-            margin-bottom: 0.25em;
+            margin-bottom: 0.85em;
           }
         `}</style>
       </Container>
