@@ -1,7 +1,8 @@
 "use client";
 
-import { Container, Title, Text, Card, Group, Badge, SimpleGrid, Paper, Flex, ThemeIcon, Timeline } from '@mantine/core';
-import { IconMap2, IconCalendarEvent, IconMapPin, IconClock } from '@tabler/icons-react';
+import { Container, Title, Text, Card, Group, Badge, SimpleGrid, Paper, Flex, ThemeIcon, Timeline, Button } from '@mantine/core';
+import { IconMap2, IconCalendarEvent, IconMapPin, IconClock, IconEdit, IconTrash } from '@tabler/icons-react';
+import { useTripPlan } from '../../context/TripPlanContext';
 import { useAuth } from '../../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -33,23 +34,24 @@ export default function MyPlansPage() {
   const [plans, setPlans] = useState<VisitPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { loadPlan } = useTripPlan();
+
+  const fetchPlans = async () => {
+    try {
+      const response = await api.get('/plans/my-plans');
+      setPlans(response.data);
+    } catch (error) {
+      console.error("Error fetching plans:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
       return;
     }
-
-    const fetchPlans = async () => {
-      try {
-        const response = await api.get('/plans/my-plans');
-        setPlans(response.data);
-      } catch (error) {
-        console.error("Error fetching plans:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPlans();
   }, [user, router]);
 
@@ -57,6 +59,30 @@ export default function MyPlansPage() {
   const getSortedItems = (items: VisitPlanItem[]) => {
     return [...items].sort((a, b) => a.visitOrder - b.visitOrder);
   };
+
+  const handleEdit = (plan: VisitPlan) => {
+    const itemsToLoad = getSortedItems(plan.items).map(item => ({
+      id: item.attraction.id,
+      name: item.attraction.name,
+      category: item.attraction.category,
+      imageUrl: ''
+    }));
+    loadPlan(itemsToLoad);
+    router.push(`/plan?editId=${plan.id}&name=${encodeURIComponent(plan.name)}&date=${plan.tripDate}`);
+  };
+
+  const handleDelete = async (planId: number) => {
+    if (confirm("Are you sure you want to delete this plan?")) {
+      try {
+        await api.delete(`/plans/${planId}`);
+        fetchPlans(); // Refresh the list
+      } catch (error) {
+        console.error("Error deleting plan", error);
+        alert("Failed to delete the plan.");
+      }
+    }
+  };
+
 
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', paddingBottom: '60px' }}>
@@ -115,6 +141,15 @@ export default function MyPlansPage() {
                     ))}
                   </Timeline>
                 </Paper>
+
+                <Group mt="md" grow>
+                  <Button variant="light" color="teal" leftSection={<IconEdit size={16} />} onClick={() => handleEdit(plan)}>
+                    Edit Plan
+                  </Button>
+                  <Button variant="light" color="red" leftSection={<IconTrash size={16} />} onClick={() => handleDelete(plan.id)}>
+                    Delete
+                  </Button>
+                </Group>
               </Card>
             ))}
           </SimpleGrid>

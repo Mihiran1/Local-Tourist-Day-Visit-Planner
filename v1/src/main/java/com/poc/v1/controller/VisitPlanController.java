@@ -32,4 +32,23 @@ public class VisitPlanController {
         List<VisitPlan> myPlans = visitPlanService.getUserVisitPlans(principal.getName());
         return ResponseEntity.ok(myPlans);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<VisitPlan> updatePlan(
+            @PathVariable Long id,
+            @RequestBody VisitPlanRequestDto requestDto,
+            Principal principal
+    ) {
+        VisitPlan updatedPlan = visitPlanService.updateVisitPlan(id, principal.getName(), requestDto);
+        return ResponseEntity.ok(updatedPlan);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlan(
+            @PathVariable Long id,
+            Principal principal
+    ) {
+        visitPlanService.deleteVisitPlan(id, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
 }

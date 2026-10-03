@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Title, Text, Button, Group, Card, ActionIcon, Flex, Badge, TextInput, Paper, Timeline, Modal } from '@mantine/core';
+import { Container, Title, Text, Button, Group, Card, ActionIcon, Flex, Badge, TextInput, Paper, Timeline, Modal, Select } from '@mantine/core';
 import { IconArrowUp, IconArrowDown, IconTrash, IconDeviceFloppy } from '@tabler/icons-react';
 import { useTripPlan } from '../../context/TripPlanContext';
 import { useAuth } from '../../context/AuthContext';
@@ -15,19 +15,59 @@ import { IconMap2 } from '@tabler/icons-react';
 const MapComponent = dynamic(() => import('../../components/Map'), { ssr: false });
 
 export default function PlanPage() {
-  const { planItems, removeFromPlan, moveItemUp, moveItemDown, clearPlan } = useTripPlan();
+  const { planItems, addToPlan, removeFromPlan, moveItemUp, moveItemDown, clearPlan } = useTripPlan();
   const { user } = useAuth();
   const router = useRouter();
   const [planName, setPlanName] = useState('My Awesome Day Trip');
   const [tripDate, setTripDate] = useState('');
   const [startTime, setStartTime] = useState('09:00');
   const [clearModalOpen, setClearModalOpen] = useState(false);
+  const [allAttractions, setAllAttractions] = useState<any[]>([]);
+  const [selectedAttractionId, setSelectedAttractionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
       router.push('/login');
     }
   }, [user, router]);
+
+  useEffect(() => {
+    const fetchAttractions = async () => {
+      try {
+        const response = await api.get('/attractions');
+        setAllAttractions(response.data);
+      } catch (error) {
+        console.error("Error fetching attractions:", error);
+      }
+    };
+    fetchAttractions();
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const editName = params.get('name');
+      const editDate = params.get('date');
+      if (editName) setPlanName(editName);
+      if (editDate) setTripDate(editDate);
+    }
+  }, []);
+
+  const handleAddSelected = () => {
+    if (!selectedAttractionId) return;
+    const attraction = allAttractions.find(a => a.id.toString() === selectedAttractionId);
+    if (attraction) {
+      addToPlan({
+        id: attraction.id,
+        name: attraction.name,
+        category: attraction.category,
+        imageUrl: attraction.imageUrls && attraction.imageUrls.length > 0 
+            ? `http://localhost:8080${encodeURI(attraction.imageUrls[0])}` 
+            : 'https://placehold.co/1200x500?text=No+Image',
+        lat: attraction.latitude,
+        lng: attraction.longitude
+      });
+      setSelectedAttractionId(null);
+    }
+  };
 
   // Parse start time "HH:MM" into hours and minutes
   const getStartMinutes = () => {
@@ -85,10 +125,19 @@ export default function PlanPage() {
         }))
       };
 
-      await api.post('/plans', payload);
-      alert("Visit plan saved successfully!");
+      const params = new URLSearchParams(window.location.search);
+      const editId = params.get('editId');
+
+      if (editId) {
+        await api.put(`/plans/${editId}`, payload);
+        alert("Visit plan updated successfully!");
+      } else {
+        await api.post('/plans', payload);
+        alert("Visit plan saved successfully!");
+      }
+      
       clearPlan();
-      router.push('/');
+      router.push('/my-plans');
     } catch (error) {
       console.error(error);
       alert("Failed to save the plan.");
@@ -155,8 +204,25 @@ export default function PlanPage() {
               </Card>
             )}
 
+            <Paper p="md" radius="md" withBorder mb="lg" bg="gray.0">
+              <Group align="flex-end">
+                <Select
+                  label="Quick Add Attraction"
+                  placeholder="Search and select an attraction"
+                  data={allAttractions.map(a => ({ value: a.id.toString(), label: a.name }))}
+                  value={selectedAttractionId}
+                  onChange={setSelectedAttractionId}
+                  searchable
+                  style={{ flex: 1 }}
+                />
+                <Button onClick={handleAddSelected} disabled={!selectedAttractionId} color="darkGreen.9">
+                  Add to Plan
+                </Button>
+              </Group>
+            </Paper>
+
             {planItems.length === 0 ? (
-              <Text c="dimmed">Your plan is empty. Go explore and add some places!</Text>
+              <Text c="dimmed">Your plan is empty. Search above or go explore to add some places!</Text>
             ) : (
               planItems.map((item, index) => (
                 <Card key={item.id} withBorder shadow="sm" radius="md" mb="sm" p="sm">

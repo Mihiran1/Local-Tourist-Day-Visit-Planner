@@ -8,4 +8,6 @@ import java.util.List;
 public interface VisitPlanService {
     VisitPlan createVisitPlan(String userEmail, VisitPlanRequestDto requestDto);
     List<VisitPlan> getUserVisitPlans(String userEmail);
+    void deleteVisitPlan(Long planId, String userEmail);
+    VisitPlan updateVisitPlan(Long planId, String userEmail, VisitPlanRequestDto requestDto);
 }

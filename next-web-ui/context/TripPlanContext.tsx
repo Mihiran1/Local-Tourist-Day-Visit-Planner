@@ -18,6 +18,7 @@ interface TripPlanContextType {
   moveItemUp: (index: number) => void;
   moveItemDown: (index: number) => void;
   clearPlan: () => void;
+  loadPlan: (items: PlanItem[]) => void;
 }
 
 const TripPlanContext = createContext<TripPlanContextType | undefined>(undefined);
@@ -73,8 +74,12 @@ export const TripPlanProvider = ({ children }: { children: ReactNode }) => {
 
   const clearPlan = () => setPlanItems([]);
 
+  const loadPlan = (items: PlanItem[]) => {
+    setPlanItems(items);
+  };
+
   return (
-    <TripPlanContext.Provider value={{ planItems, addToPlan, removeFromPlan, moveItemUp, moveItemDown, clearPlan }}>
+    <TripPlanContext.Provider value={{ planItems, addToPlan, removeFromPlan, moveItemUp, moveItemDown, clearPlan, loadPlan }}>
       {children}
     </TripPlanContext.Provider>
   );

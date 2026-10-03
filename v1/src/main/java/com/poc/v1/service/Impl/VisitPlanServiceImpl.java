@@ -69,4 +69,48 @@ public class VisitPlanServiceImpl implements VisitPlanService {
                 
         return visitPlanRepository.findByUser(user);
     }
+
+    @Override
+    public void deleteVisitPlan(Long planId, String userEmail) {
+        VisitPlan plan = visitPlanRepository.findById(planId)
+                .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
+        
+        if (!plan.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        
+        visitPlanRepository.delete(plan);
+    }
+
+    @Override
+    public VisitPlan updateVisitPlan(Long planId, String userEmail, VisitPlanRequestDto requestDto) {
+        VisitPlan plan = visitPlanRepository.findById(planId)
+                .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
+                
+        if (!plan.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        
+        plan.setName(requestDto.getName());
+        plan.setTripDate(requestDto.getTripDate());
+        
+        // Clear existing items
+        plan.getItems().clear();
+        
+        // Add new items
+        for (VisitPlanItemRequestDto itemDto : requestDto.getItems()) {
+            Attraction attraction = attractionRepository.findById(itemDto.getAttractionId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Attraction not found"));
+
+            VisitPlanItem item = VisitPlanItem.builder()
+                    .visitPlan(plan)
+                    .attraction(attraction)
+                    .visitOrder(itemDto.getVisitOrder())
+                    .build();
+
+            plan.getItems().add(item);
+        }
+        
+        return visitPlanRepository.save(plan);
+    }
 }

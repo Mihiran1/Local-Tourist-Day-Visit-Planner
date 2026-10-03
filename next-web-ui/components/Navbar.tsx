@@ -12,18 +12,17 @@ export default function Navbar() {
 
   return (
     <div style={{ borderBottom: '1px solid #eaeaea', backgroundColor: '#ffffff' }}>
-      <Container fluid px={{ base: 'xs', sm: 'md', lg: 150 }} h={70}>
-        <Group justify="space-between" h="100%" wrap="nowrap">
-          
+      <Container fluid px={{ base: 'md', lg: 150 }} h={70}>
+        <Group justify="space-between" h="100%">
+
           {/* Left: Logo */}
           <Group>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-              <Image 
-                src="/4.png" 
-                alt="Travel LK Logo" 
-                h={{ base: 30, sm: 45 }} 
-                w="auto"
-                fit="contain" 
+            <Link href="/">
+              <Image
+                src="/4.png"
+                alt="Travel LK Logo"
+                h={45}
+                fit="contain"
                 style={{ cursor: 'pointer', transition: 'transform 0.2s ease' }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -40,7 +39,7 @@ export default function Navbar() {
           </Group>
 
           {/* Right: Auth Buttons / Profile */}
-          <Group wrap="nowrap">
+          <Group>
             {!user ? (
               <>
                 <Button variant="default" radius="xl" fw={600} onClick={() => router.push('/login')}>Log in</Button>
@@ -72,8 +71,8 @@ export default function Navbar() {
                     Settings
                   </Menu.Item>
                   <Menu.Divider />
-                  <Menu.Item 
-                    color="red" 
+                  <Menu.Item
+                    color="red"
                     leftSection={<IconLogout size={14} />}
                     onClick={logout}
                   >
