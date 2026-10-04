@@ -149,10 +149,11 @@ export default function PlanPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <Container size="lg" mt={40}>
+      <div style={{ flex: 1 }}>
+        <Container size="lg" mt={40}>
         <Group justify="space-between" align="center" mb="xl">
           <Title order={1} fw={900}>Build Your Perfect Day Trip</Title>
           {planItems.length > 0 && (
@@ -290,6 +291,7 @@ export default function PlanPage() {
           </div>
         </Flex>
       </Container>
+      </div>
       
       {/* Clear Plan Confirmation Modal */}
       <Modal 

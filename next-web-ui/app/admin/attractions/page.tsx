@@ -234,7 +234,7 @@ export default function AttractionsListPage() {
       <Drawer 
         opened={viewModalOpen} 
         onClose={() => setViewModalOpen(false)} 
-        title={<Title order={4}>{selectedAttraction?.name}</Title>}
+        title={<Text fw={700} size="xl">{selectedAttraction?.name}</Text>}
         position="right"
         size="md"
         padding="lg"

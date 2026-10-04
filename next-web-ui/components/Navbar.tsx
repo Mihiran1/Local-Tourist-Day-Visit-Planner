@@ -52,8 +52,8 @@ export default function Navbar() {
                 <Menu.Target>
                   <UnstyledButton>
                     <Group gap={7}>
-                      <Avatar radius="xl">{user.firstName?.charAt(0) || 'U'}</Avatar>
-                      <Text fw={500} size="sm" lh={1} mr={3}>{user.firstName || 'User'}</Text>
+                      <Avatar radius="xl">{user.email?.charAt(0).toUpperCase() || 'U'}</Avatar>
+                      <Text fw={500} size="sm" lh={1} mr={3}>{user.email?.split('@')[0] || 'User'}</Text>
                       <IconChevronDown size={12} stroke={1.5} />
                     </Group>
                   </UnstyledButton>
