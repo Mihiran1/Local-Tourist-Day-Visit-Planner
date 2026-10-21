@@ -60,15 +60,8 @@ export default function Navbar() {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <Menu.Label>Application</Menu.Label>
-                  <Menu.Item leftSection={<IconHeart size={14} />} onClick={() => router.push('/favorites')}>
-                    My Favorites
-                  </Menu.Item>
                   <Menu.Item leftSection={<IconMap2 size={14} />} onClick={() => router.push('/my-plans')}>
                     My Plans
-                  </Menu.Item>
-                  <Menu.Item leftSection={<IconSettings size={14} />}>
-                    Settings
                   </Menu.Item>
                   <Menu.Divider />
                   <Menu.Item
