@@ -1,16 +1,28 @@
-import { Navigate, Outlet } from 'react-router-dom';
+"use client";
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
-  // User ලොග් වෙලා නැත්නම්, එයාව කෙලින්ම /login එකට යවනවා
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  // If the user is not logged in, redirect them to the login page
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, router]);
 
-  // ලොග් වෙලා නම්, එයා ඉල්ලපු Page එක (Outlet) පෙන්නනවා
-  return <Outlet />;
+  // If logged in, render the requested page
+  if (!isAuthenticated) return null;
+
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

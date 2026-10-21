@@ -21,14 +21,14 @@ export const metadata: Metadata = {
   description: "Generated for Travel App",
 };
 
-// 1. අපි මෙතනින් මුළු ප්‍රොජෙක්ට් එකටම අදාළ ප්‍රධාන පාටවල් (Global Colors) නිර්වචනය කරනවා
+// 1. Define the global theme for the entire project, including the primary color palette
 const theme = createTheme({
-  primaryColor: 'darkGreen', // මුළු වෙබ්සයිට් එකේම ප්‍රධාන පාට (Primary) විදියට 'teal' (කොළ පාට) දානවා
+  primaryColor: 'darkGreen', // Set 'darkGreen' as the primary color used throughout the entire website
   colors: {
-    // අර Title වලට පාවිච්චි කරපු තද කොළ පාටත් අපි වෙනමම නමකින් ('darkGreen') හදලා තියාගන්නවා
+    // Custom dark green color scale used for headings and primary UI elements
     darkGreen: [
       '#eef8f2', '#dcf1e4', '#b5e3c8', '#8cd5aa', '#6ac890',
-      '#53bf7e', '#45ba74', '#36a362', '#2c9256', '#1b4332' // Index 9 තමයි #1b4332
+      '#53bf7e', '#45ba74', '#36a362', '#2c9256', '#1b4332' // Index 9 is the darkest shade (#1b4332)
     ],
   },
 });
@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        {/* 2. අපි හදපු ඒ Theme එක මෙතනින් මුළු App එකටම Apply කරනවා */}
+        {/* 2. Apply the custom theme defined above to the entire application */}
         <MantineProvider theme={theme}>
           <AuthProvider>
              <TripPlanProvider>   

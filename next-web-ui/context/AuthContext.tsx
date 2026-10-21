@@ -2,13 +2,13 @@
 
 import { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
 
-// User ගේ විස්තර වලට අදාළ Type එක
+// Type definition for a user's details
 interface User {
   email: string;
   role: string;
 }
 
-// Context එකේ තියෙන දේවල් මොනවාද කියලා Type කරනවා
+// Type definition for all values exposed by the Auth context
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -16,31 +16,33 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// 1. Context එක හැදීම
+// 1. Create the Auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 2. Provider Component එක - මෙයා තමයි දත්ත බෙදන්නේ
+// Helper to safely read the stored user from localStorage on initial render
+function getInitialUser(): User | null {
+  if (typeof window === 'undefined') return null;
+  const token = localStorage.getItem('token');
+  const storedUser = localStorage.getItem('user');
+  if (token && storedUser) {
+    try { return JSON.parse(storedUser); } catch { return null; }
+  }
+  return null;
+}
+
+// 2. Provider component — responsible for sharing auth state with child components
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  // Use a lazy initializer to read localStorage once on mount, avoiding setState-in-effect
+  const [user, setUser] = useState<User | null>(getInitialUser);
 
-  // App එක Refresh කරද්දී LocalStorage එකේ Token එකක් තියෙනවද බලලා User ව ලොග් කරනවා
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  // Login ෆන්ක්ෂන් එක
+  // Login function — saves the token and user data to localStorage
   const login = (token: string, userData: User) => {
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData)); // User ගේ විස්තරත් සේව් කරනවා (නම පෙන්නන්න වගේ දේවල් වලට)
+    localStorage.setItem('user', JSON.stringify(userData)); // Also save user details for display purposes
     setUser(userData);
   };
 
-  // Logout ෆන්ක්ෂන් එක
+  // Logout function — clears auth state and localStorage
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// 3. Custom Hook එක - වෙන Components වලට ලේසියෙන්ම මේ දත්ත ගන්න
+// 3. Custom hook — allows other components to easily access auth data
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

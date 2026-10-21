@@ -34,7 +34,7 @@ export default function ResetPassword() {
         otpCode: values.otpCode,
         newPassword: values.newPassword
       });
-      // සාර්ථකව වෙනස් කළාම Login පිටුවට යවනවා
+      // On success, redirect the user to the login page
       router.push('/login');
     } catch (error: any) {
       form.setErrors({ otpCode: error.response?.data?.message || 'Failed to reset password' });

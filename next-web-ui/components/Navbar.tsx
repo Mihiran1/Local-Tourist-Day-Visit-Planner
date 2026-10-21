@@ -47,7 +47,7 @@ export default function Navbar() {
               </>
 
             ) : (
-              // ලොග් වුණු කෙනෙක්ට පේන Profile Menu එක
+              // Profile menu shown to logged-in users
               <Menu shadow="md" width={200} position="bottom-end">
                 <Menu.Target>
                   <UnstyledButton>

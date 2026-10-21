@@ -19,13 +19,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AppShell
-      layout="alt" // මේකෙන් තමයි Sidebar එක Full Height කරන්නේ!
+      layout="alt" // Makes the sidebar span the full height of the page
       header={{ height: 70 }} 
       navbar={{ width: 280, breakpoint: 'sm', collapsed: { mobile: !opened } }} 
       padding="md"
       bg="gray.0" 
     >
-      {/* 1. Top Header එක (දැන් මේකේ තියෙන්නේ Burger එකයි User Menu එකයි විතරයි) */}
+      {/* 1. Top header bar — contains the burger menu toggle and user profile menu */}
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Group gap="xs">
@@ -64,16 +64,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Group>
       </AppShell.Header>
 
-      {/* 2. Side Navbar එක (දැන් Travel LK Admin නම තියෙන්නේ මෙතන) */}
+      {/* 2. Side navbar — contains the logo and navigation links */}
       <AppShell.Navbar p="md">
         <Group mb="xl" justify="space-between" align="center">
           <Image 
             src="/4.png" 
             alt="Travel LK Logo" 
-            w={230} // ලෝගෝ එකේ සයිස් එක 200 දක්වා වැඩි කළා
+            w={230} // Logo display width
             fit="contain" 
           />
-          {/* Mobile එකේදී Sidebar එක ඇරියම ඒක වහන්න මෙතනත් Burger එකක් දාන්න ඕනේ */}
+          {/* Burger button inside the sidebar to close it on mobile */}
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         </Group>
 
@@ -105,7 +105,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       </AppShell.Navbar>
 
-      {/* 3. ප්‍රධාන Content එක */}
+      {/* 3. Main content area */}
       <AppShell.Main>
         {children}
       </AppShell.Main>

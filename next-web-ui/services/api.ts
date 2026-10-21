@@ -1,20 +1,20 @@
 import axios from 'axios';
 
-// 1. Axios Instance එකක් හැදීම
+// 1. Create an Axios instance with a base URL and default headers
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // අපේ Spring Boot Backend එකේ URL එක
+  baseURL: 'http://localhost:8080/api', // Base URL of our Spring Boot backend
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// 2. Request Interceptor එක
+// 2. Request interceptor — attaches the auth token to every outgoing request
 api.interceptors.request.use(
   (config) => {
-    // LocalStorage එකෙන් Token එක ගන්නවා
+    // Retrieve the auth token from localStorage
     const token = localStorage.getItem('token');
     
-    // Token එකක් තියෙනවා නම්, ඒක Header එකට දානවා
+    // If a token exists, attach it to the Authorization header
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,12 +26,12 @@ api.interceptors.request.use(
   }
 );
 
-//Response Interceptor එක - Token එක Expire වෙලා නම් User ව Logout කරන්න මේක පාවිච්චි කරන්න පුළුවන්.
+// Response interceptor — handles 401 errors by clearing storage and redirecting to login
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Token එක Expire වෙලා නම්, ලෝකල් ස්ටෝරේජ් එක මකලා Login එකට යවන්න පුළුවන්
+      // On 401 Unauthorized, clear local storage and redirect to the login page
       console.error("Unauthorized! Redirecting to login...");
       localStorage.removeItem('token');
       localStorage.removeItem('user');

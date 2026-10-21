@@ -50,7 +50,7 @@ const BRAND = {
   ink: '#0B2B1E',    // near-black green for headings
 };
 
-// API එකෙන් එන දත්ත වල හැඩය (Type එක) මෙතන කියනවා
+// Defines the shape (type) of the data returned by the dashboard stats API
 interface DashboardStats {
   totalAttractions: number;
   totalUsers: number;
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const { user } = useAuth();
 
-  // ඇත්ත දත්ත තියාගන්න State එකක් හැදීම
+  // State to hold the real dashboard statistics fetched from the API
   const [stats, setStats] = useState<DashboardStats>({
     totalAttractions: 0,
     totalUsers: 0,
@@ -79,9 +79,9 @@ export default function AdminDashboard() {
   const [categoryData, setCategoryData] = useState<{name: string, value: number, color: string}[]>([]);
   const [recentAttractions, setRecentAttractions] = useState<any[]>([]);
 
-  // Page එක Load වෙද්දී API එකට කතා කිරීම
+  // Fetch data from the API when the page first loads
   useEffect(() => {
-    // Admin කෙනෙක් නෙවෙයි නම් මේ Page එකට එන්න දෙන්නේ නෑ
+    // Redirect non-admin users away from this page
     if (user && user.role !== 'ROLE_ADMIN' && user.role !== 'ADMIN') {
       router.push('/attractions');
       return;
@@ -89,15 +89,15 @@ export default function AdminDashboard() {
 
     const fetchStats = async () => {
       try {
-        // අර අපි Backend එකේ හදපු අලුත් API එකට කතා කරනවා
+        // Call the dashboard stats API endpoint
         const response = await api.get('/admin/dashboard/stats');
-        setStats(response.data); // ආපු දත්ත ටික State එකට දාගන්නවා
+        setStats(response.data); // Store the received stats in state
 
-        // සියලුම Attractions අරගෙන Charts වලට ඕන දත්ත හදනවා
+        // Fetch all attractions and prepare chart data
         const attrRes = await api.get('/attractions');
         const attractions = attrRes.data;
 
-        // Category අනුව කීයක් තියෙනවද කියලා ගණන් කරනවා
+        // Count attractions per category
         const categoryCount: Record<string, number> = {};
         attractions.forEach((a: any) => {
           const cat = a.category || 'Other';
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
     fetchStats();
   }, [user, router]);
 
-  // අර State එකේ තියෙන ඇත්ත දත්ත පාවිච්චි කරලා අර කාඩ් 5ට ඕන දත්ත හදාගන්නවා
+  // Build the stats card data using the values from state
   const statsData = [
     { title: "Total Attractions", value: stats.totalAttractions.toString(), diff: "+8%", icon: IconMapPin },
     { title: "Published", value: stats.totalAttractions.toString(), diff: "+12%", icon: IconCheck },
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
             <Text size="sm" fw={600} c={BRAND.gold} tt="uppercase" style={{ letterSpacing: 1 }}>
               {getGreeting()}
             </Text>
-            {/* මෙතන Admin ගේ ඇත්ත ඊමේල් එක පෙන්වනවා */}
+            {/* Display the logged-in admin's email address */}
             <Title order={2} c="white" fw={700}>
               {user?.email} 👋
             </Title>

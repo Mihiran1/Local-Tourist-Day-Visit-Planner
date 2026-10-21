@@ -37,10 +37,10 @@ export default function Login() {
       const response = await api.post('/auth/login', values);
       const { data } = response.data;
       
-      // Backend එකෙන් එවන්නේ accessToken කියලයි
+      // The backend returns the token as 'accessToken'
       login(data.accessToken, { email: data.email, role: data.role });
       
-      // Role එක අනුව යවන Page එක තීරණය කරනවා
+      // Determine the redirect page based on the user's role
       if (data.role === 'ADMIN' || data.role === 'ROLE_ADMIN') {
         router.push('/admin/dashboard');
       } else {

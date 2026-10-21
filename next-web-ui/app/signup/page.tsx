@@ -43,7 +43,7 @@ export default function Signup() {
     try {
       await api.post('/auth/signup', values);
       
-      // සාර්ථකව ගිණුම හැදුවාම, OTP Verify කරන පිටුවට යවනවා
+      // On successful signup, redirect to the OTP verification page
       router.push(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } catch (error: any) {
       if (error.response?.data?.message) {

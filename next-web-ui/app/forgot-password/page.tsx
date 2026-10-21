@@ -19,7 +19,7 @@ export default function ForgotPassword() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       await api.post('/auth/forgot-password', values);
-      // සාර්ථක වුණාම ඊළඟ පිටුවට (Reset Password) යවනවා
+      // On success, redirect to the Reset Password page
       router.push(`/reset-password?email=${encodeURIComponent(values.email)}`);
     } catch (error: any) {
       form.setErrors({ email: error.response?.data?.message || 'Failed to send OTP' });

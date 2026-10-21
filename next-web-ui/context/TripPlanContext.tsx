@@ -23,16 +23,19 @@ interface TripPlanContextType {
 
 const TripPlanContext = createContext<TripPlanContextType | undefined>(undefined);
 
-export const TripPlanProvider = ({ children }: { children: ReactNode }) => {
-  const [planItems, setPlanItems] = useState<PlanItem[]>([]);
+// Helper to safely read the stored trip plan from localStorage on initial render
+function getInitialPlanItems(): PlanItem[] {
+  if (typeof window === 'undefined') return [];
+  const saved = localStorage.getItem('tripPlan');
+  if (saved) {
+    try { return JSON.parse(saved); } catch { return []; }
+  }
+  return [];
+}
 
-  // Load from local storage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('tripPlan');
-    if (saved) {
-      try { setPlanItems(JSON.parse(saved)); } catch (e) {}
-    }
-  }, []);
+export const TripPlanProvider = ({ children }: { children: ReactNode }) => {
+  // Use a lazy initializer to read localStorage once on mount, avoiding setState-in-effect
+  const [planItems, setPlanItems] = useState<PlanItem[]>(getInitialPlanItems);
 
   // Save to local storage when items change
   useEffect(() => {

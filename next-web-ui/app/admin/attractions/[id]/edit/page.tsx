@@ -79,7 +79,7 @@ export default function EditAttractionPage() {
     setImagePreviews(newPreviews);
   };
 
-  // Page එක Load වෙද්දී පරණ Data ගේන කෑල්ල
+  // Fetch existing attraction data when the page loads
   useEffect(() => {
     if (!id) return;
     
@@ -88,7 +88,7 @@ export default function EditAttractionPage() {
         const res = await api.get(`/attractions/${id}`);
         const data = res.data;
         
-        // පරණ Opening Time එක කඩලා Drop Downs වලට දාන විදිය
+        // Parse the stored opening time string and split it into dropdown values
         const timeStr = data.openingTime || '';
         let openTime = '';
         let openAmPm = 'AM';
@@ -109,7 +109,7 @@ export default function EditAttractionPage() {
           if (start.length === 2) { openTime = start[0]; openAmPm = start[1]; }
         }
         
-        // ගෙනාපු Data ටික Form එකට දානවා (Auto fill වෙනවා)
+        // Populate the form fields with the fetched data (auto-fill)
         form.setValues({
           name: data.name || '',
           category: data.category || '',
@@ -164,7 +164,7 @@ export default function EditAttractionPage() {
         data.append('images', file);
       });
 
-      // Update කරන නිසා api.put පාවිච්චි කරනවා
+      // Use PUT request to update the existing attraction
       await api.put(`/admin/attractions/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });

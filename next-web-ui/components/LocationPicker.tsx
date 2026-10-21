@@ -3,10 +3,10 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-// Leaflet වල සාමාන්‍ය Marker (Pin එක) Next.js එක්ක දාද්දි සමහර වෙලාවට පෙන්නන්නේ නෑ.
-// ඒකට විසඳුමක් විදියට අපි ඒ පින්තූර අන්තර්ජාලයෙන් (CDN එකකින්) කෙලින්ම ගන්නවා.
+// Leaflet's default marker icons can fail to load in Next.js.
+// As a workaround, we load the marker images directly from a CDN.
 const icon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -21,71 +21,77 @@ interface LocationPickerProps {
   onChange: (lat: number, lng: number) => void;
 }
 
-// මේක තමයි Map එක උඩ Click කරද්දි Pin එක එතනට වැටෙන්න හදන Component එක.
+// This component places a map marker wherever the user clicks on the map.
 function LocationMarker({ position, onChange }: { position: [number, number] | null, onChange: (lat: number, lng: number) => void }) {
   
-  // useMapEvents කියන්නේ Map එක ඇතුලේ වෙන දේවල් (Click කරන ඒවා වගේ) අල්ලගන්න පුළුවන් ක්‍රමයක්.
+  // useMapEvents allows us to listen for interactions (such as clicks) inside the map.
   const map = useMapEvents({
     click(e) {
-      // කවුරු හරි Map එකේ කොතන හරි Click කරපු ගමන්, ඒ තැන Latitude එකයි Longitude එකයි අපි onChange එකෙන් එළියට යවනවා.
+      // When the user clicks anywhere on the map, emit the latitude and longitude via onChange.
       onChange(e.latlng.lat, e.latlng.lng);
     },
   });
 
-  // අපි අලුතින් තැනක් දුන්නොත්, Map එක ඔටෝම ඒ තැනට යනවා.
+  // When a new position is provided, smoothly pan the map to that location.
   useEffect(() => {
     if (position) {
       const timeoutId = setTimeout(() => {
         try {
           map.flyTo(position, map.getZoom());
-        } catch (e) {
+        } catch {
           try {
             map.setView(position, map.getZoom());
-          } catch (e2) {}
+          } catch { /* ignore */ }
         }
       }, 100);
       return () => clearTimeout(timeoutId);
     }
   }, [position, map]);
 
-  // දැනට තැනක් (position) තියෙනවා නම් විතරක් Pin එක පෙන්නනවා.
+  // Only render the marker if a position has been set.
   return position === null ? null : (
     <Marker position={position} icon={icon} />
   );
 }
 
-// මේක තමයි ප්‍රධාන Map Component එක. මේක තමයි අපි Form එකට දාන්නේ.
+// This is the main Map component that gets used in forms.
 export default function LocationPicker({ latitude, longitude, onChange }: LocationPickerProps) {
-  const [mounted, setMounted] = useState(false);
+  // Use a ref to track client-side mount without triggering setState-in-effect lint errors
+  const mountedRef = useRef(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Guard against double-invocation in React Strict Mode
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      setIsClient(true);
+    }
   }, []);
-  
-  // දෙහිඅත්තකණ්ඩිය ප්‍රදේශයේ ඛණ්ඩාංක (Default Center)
+
+  // Default center coordinates (Dehiattakandiya area, Sri Lanka)
   const defaultCenter: [number, number] = [7.6667, 81.0333];
   
   const position: [number, number] | null = 
     (latitude && longitude) ? [latitude, longitude] : null;
 
-  if (!mounted) {
+  if (!isClient) {
     return <div style={{ height: '400px', width: '100%', borderRadius: '8px', backgroundColor: '#eaeaea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Map...</div>;
   }
 
   return (
-    // MapContainer එකෙන් තමයි සම්පූර්ණ Map එක හැදෙන්නේ
+    // MapContainer renders the full interactive map
     <MapContainer 
       center={position || defaultCenter} 
       zoom={12} 
       style={{ height: '400px', width: '100%', borderRadius: '8px', zIndex: 1 }}
     >
-      {/* TileLayer එකෙන් තමයි පාරවල් ගස් කොළන් තියෙන ඇත්ත Map පින්තූර ටික ගෙනල්ලා පෙන්නන්නේ (OpenStreetMap එකෙන්) */}
+      {/* TileLayer loads the actual map tiles (roads, buildings, etc.) from OpenStreetMap */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      {/* අර උඩ හදපු Marker කෑල්ල */}
+      {/* Render the LocationMarker component defined above */}
       <LocationMarker position={position} onChange={onChange} />
     </MapContainer>
   );

@@ -10,12 +10,12 @@ import '../globals.css'; // Use globals if Login.css is not copied, or adjust th
 export default function VerifyOtp() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get('email') || ''; // URL එකෙන් email එක ගන්නවා
+  const email = searchParams.get('email') || ''; // Read the email from the URL query params
 
-  // ඊමේල් එකක් නැත්නම් ආපහු Signup එකට යවනවා
+  // If no email is present in the URL, redirect back to the signup page
   useEffect(() => {
     if (!email) {
-      router.replace('/signup'); // react-router-dom එකේ replace: true වෙනුවට Next.js වල මෙහෙමයි පාවිච්චි කරන්නේ
+      router.replace('/signup'); // Use router.replace() in Next.js instead of React Router's replace: true
     }
   }, [email, router]);
 
@@ -34,8 +34,8 @@ export default function VerifyOtp() {
         email: email,
         otpCode: values.otpCode,
       });
-      // සාර්ථක වුණාම ආපහු Login එකට යවනවා
-      router.push('/login'); // Next.js වල navigate වෙනුවට router.push පාවිච්චි කරනවා
+      // On success, redirect the user back to the login page
+      router.push('/login'); // Use router.push() in Next.js instead of React Router's navigate()
     } catch (error: any) {
       if (error.response?.data?.message) {
         form.setErrors({ otpCode: error.response.data.message });

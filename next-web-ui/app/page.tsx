@@ -83,7 +83,7 @@ export default function HomePage() {
 
   const categoryData = [
     { name: 'Nature & Wildlife', count: 24, icon: <IconTree size={16} />, image: '/ca1.png' },
-    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: '/ca22.jpg' },
+    { name: 'Religious & Sacred', count: 18, icon: <IconBuildingChurch size={16} />, image: '/ca2.jpeg' },
     { name: 'Heritage Sites', count: 12, icon: <IconBuildingMonument size={16} />, image: '/ca3.jpeg' },
     { name: 'Cultural', count: 9, icon: <IconMasksTheater size={16} />, image: '/ca4.jpeg' },
     { name: 'Adventure', count: 7, icon: <IconTrekking size={16} />, image: '/ca55.png' },
@@ -577,8 +577,6 @@ export default function HomePage() {
           ))}
         </SimpleGrid>
       </Container>
-
-  
       <Footer />
     </div>
   );
